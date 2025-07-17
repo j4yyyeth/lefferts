@@ -1,0 +1,63 @@
+---
+export interface Props {
+  properties: Array<{
+    id: number;
+    title: string;
+    location: string;
+    image: string;
+    link: string;
+    hasVideo?: boolean;
+  }>;
+}
+
+const { properties } = Astro.props;
+---
+
+<div class="all-buildings properties">
+  {properties.map((property) => (
+    <a 
+      href={property.link} 
+      class="container building-wrapper"
+      data-astro-prefetch
+    >
+      <div class="content building">
+        <img 
+          class="content-image lazyload" 
+          src={property.image}
+          alt={property.title}
+          loading="lazy"
+          data-astro-transition-persist={`property-image-${property.id}`}
+          style={`--transition-name: property-image-${property.id}`}
+          onload="this.style.opacity = '1'"
+          style="opacity: 0; transition: opacity 0.3s ease;"
+        />
+      </div>
+      <p>{property.title}</p>
+      <p class="no-space">{property.location}</p>
+    </a>
+  ))}
+</div>
+
+<style>
+  /* Ensure smooth transitions across all browsers */
+  .content-image {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  /* Safari-specific fixes */
+  @supports (-webkit-appearance: none) {
+    .content-image {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+  }
+  
+  /* Firefox-specific fixes */
+  @-moz-document url-prefix() {
+    .content-image {
+      transform: translateZ(0);
+    }
+  }
+</style>

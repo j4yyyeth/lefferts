@@ -1,0 +1,24 @@
+---
+export interface Props {
+  text: string;
+  videoSrc?: string;
+}
+
+const { text, videoSrc } = Astro.props;
+---
+
+<div class="hero-section">
+  <div class="hero-vid">
+    {videoSrc && (
+      <video playsinline autoplay muted loop preload="auto">
+        <source src={videoSrc} type="video/mp4" />
+      </video>
+    )}
+  </div>
+  <div class="hero-content">
+    <h1>{text}</h1>
+  </div>
+  <div class="arrow">
+    <a href="#site" class="down-arrow" aria-label="Scroll down"></a>
+  </div>
+</div>

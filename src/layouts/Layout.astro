@@ -1,0 +1,84 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { ClientRouter } from 'astro:transitions';
+
+export interface Props {
+  title: string;
+  description?: string;
+  isHome?: boolean;
+}
+
+const { title, description = '', isHome = false } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="description" content={description} />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>{title}</title>
+  
+  <!-- Preload critical fonts -->
+  <link rel="preload" href="/fonts/hudson.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="/fonts/hudson-bold.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="/fonts/neue-l.ttf" as="font" type="font/ttf" crossorigin />
+  <link rel="preload" href="/fonts/neue-m.ttf" as="font" type="font/ttf" crossorigin />
+  
+  <!-- Use ClientRouter instead of ClientRouter for better cross-browser support -->
+  <ClientRouter />
+  
+  <style>
+    /* Add CSS to help with transition smoothness across browsers */
+    html {
+      view-transition-name: none;
+    }
+    
+    /* Ensure images are ready for transitions */
+    img[data-astro-transition-persist] {
+      view-transition-name: var(--transition-name);
+    }
+    
+    /* Fallback for browsers without native support */
+    @media (prefers-reduced-motion: no-preference) {
+      html:not(.astro-view-transitions-fallback) {
+        view-transition-name: root;
+      }
+    }
+  </style>
+</head>
+<body>
+  <Header isHome={isHome} />
+  <main class={isHome ? 'home-main' : 'page-main'}>
+    <slot />
+  </main>
+  <Footer showNewsletter={isHome} />
+  
+  <script>
+    import '../scripts/main.js';
+    
+    // Enhanced view transition handling for Safari/Firefox
+    document.addEventListener('astro:before-preparation', () => {
+      // Ensure all images are loaded before transition
+      const images = document.querySelectorAll('img[data-astro-transition-persist]');
+      images.forEach(img => {
+        if (!img.complete) {
+          img.addEventListener('load', () => {
+            // Image loaded, safe to transition
+          });
+        }
+      });
+    });
+
+    // Handle transition fallbacks
+    document.addEventListener('astro:after-swap', () => {
+      // Re-initialize any scripts that need it after page swap
+      if (typeof window.initializeSliders === 'function') {
+        window.initializeSliders();
+      }
+    });
+  </script>
+</body>
+</html>

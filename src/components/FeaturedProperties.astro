@@ -1,0 +1,36 @@
+---
+export interface Props {
+  property1: {
+    image: string;
+    title: string;
+    link: string;
+  };
+  property2: {
+    image: string;
+    title: string;
+    link?: string;
+  };
+}
+
+const { property1, property2 } = Astro.props;
+---
+
+<div class="property-imgs">
+  <div class="property-home">
+    <img src={property1.image} alt={property1.title} />
+    <a href={property1.link}>
+      <p>{property1.title}</p>
+    </a>
+  </div>
+  <div class="property-divider"></div>
+  <div class="property-home">
+    <img src={property2.image} alt={property2.title} />
+    {property2.link ? (
+      <a href={property2.link}>
+        <p>{property2.title}</p>
+      </a>
+    ) : (
+      <p>{property2.title}</p>
+    )}
+  </div>
+</div>

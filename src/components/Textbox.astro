@@ -1,0 +1,13 @@
+---
+export interface Props {
+  heading: string;
+  content: string;
+}
+
+const { heading, content } = Astro.props;
+---
+
+<div class="textbox">
+  <h3>{heading}</h3>
+  <div class="textbox-content" set:html={content} />
+</div>

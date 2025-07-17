@@ -1,0 +1,23 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PropertyDetail from '../../components/PropertyDetail.astro';
+import portfolioData from '../../data/portfolio.json';
+
+export async function getStaticPaths() {
+  const { properties } = portfolioData;
+
+  return properties.map((property) => ({
+    params: { slug: property.slug },
+    props: { property },
+  }));
+}
+
+const { property } = Astro.props;
+---
+
+<Layout
+  title={`${property.title} - Lefferts`}
+  description={`Learn more about ${property.title}, a premium development by Lefferts.`}
+>
+  <PropertyDetail property={property} />
+</Layout>

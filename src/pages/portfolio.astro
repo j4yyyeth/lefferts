@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PropertyGrid from '../components/PropertyGrid.astro';
+import portfolioData from '../data/portfolio.json';
+
+const { properties } = portfolioData;
+
+// Transform data for the grid component
+const gridProperties = properties.map(property => ({
+  id: property.id,
+  title: property.title,
+  location: property.location,
+  image: property.featuredImage,
+  link: `/portfolio/${property.slug}`,
+  hasVideo: !!property.featuredVideo
+}));
+---
+
+<Layout title="Portfolio - Lefferts" description="Explore our portfolio of exceptional real estate developments">
+  <PropertyGrid properties={gridProperties} />
+</Layout>

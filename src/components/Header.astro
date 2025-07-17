@@ -1,0 +1,43 @@
+---
+export interface Props {
+  isHome?: boolean;
+}
+
+const { isHome = false } = Astro.props;
+---
+
+<header>
+  <nav class={`${!isHome ? 'white-bg' : 'home-menu'} main-menu`}>
+    <div class="menu-main-container">
+      <ul id="menu-main">
+        <li><a href="/">About</a></li>
+        <li><a href="/portfolio">Portfolio</a></li>
+        <li><a href="/press">Press</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+    <a href="/"
+      ><img class="logo-img" src="/images/lefferts-logo.svg" alt="Lefferts logo" /></a
+    >
+  </nav>
+
+  <nav class="mobile-menu">
+    <div class="hamburger" id="hamburger-1">
+      <span class="line"></span>
+      <span class="line"></span>
+      <span class="line"></span>
+    </div>
+    <a href="/"
+      ><img class="logo-img" src="/images/lefferts-logo.svg" alt="Lefferts logo" /></a
+    >
+  </nav>
+
+  <div class="mobile-items">
+    <ul>
+      <li><a href="/">About</a></li>
+      <li><a href="/portfolio">Portfolio</a></li>
+      <li><a href="/press">Press</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </div>
+</header>

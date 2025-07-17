@@ -1,0 +1,228 @@
+{
+  "properties": [
+    {
+      "id": 1,
+      "slug": "72-park",
+      "title": "72 Park",
+      "location": "Miami Beach, FL",
+      "address": "580 72nd Street  Miami Beach, FL 33141",
+      "type": "Residential & Mixed-Use",
+      "design": "Urban Robot",
+      "website": "http://www.72park.com",
+      "content": "<p>At 72 Park, luxury living meets the vibrant energy of Miami Beach. Located in the desirable North Beach neighborhood, this stunning development offers residents the best of both worlds - a peaceful and exclusive community with easy access to the excitement of the city.</p><p>Each unit at 72 Park has been carefully designed to provide maximum comfort and style. Inside, the units are spacious and bright, with open floor plans and high ceilings. Residences combine luxury and style with condo-grade interior finishes. With the use of top of the line Italian cabinetry and energy efficient appliances, a modern and sustainable unit is created. Outdoor amenity space exceeds 30,000 square feet with a viewing deck, outdoor garden and lap pool.</p><p>In addition to its luxurious features, 72 Park is also located in a convenient and vibrant neighborhood. Many popular shops, restaurants, and entertainment venues are within walking distance, providing residents with endless opportunities for exploration and enjoyment.</p>",
+      "featuredVideo": "",
+      "featuredImage": "/images/portfolio/72-featured.jpg",
+      "gallery": [
+        "/images/portfolio/72-1.jpg",
+        "/images/portfolio/72-2.jpg",
+        "/images/portfolio/72-3.jpg",
+        "/images/portfolio/72-4.jpg",
+        "/images/portfolio/72-5.jpg",
+        "/images/portfolio/72-6.jpg",
+        "/images/portfolio/72-7.jpg",
+        "/images/portfolio/72-8.jpg",
+        "/images/portfolio/72-9.jpg",
+        "/images/portfolio/72-10.jpg",
+        "/images/portfolio/72-11.jpg"
+      ],
+      "highlights": [
+        "22 Stories",
+        "266 Residences",
+        "10,000 Square Feet Retail Space",
+        "501,788 SF"
+      ]
+    },
+    {
+      "id": 2,
+      "slug": "palma-miami-beach",
+      "title": "Palma",
+      "location": "Miami Beach, FL",
+      "address": "600 71st Street  Miami Beach, FL 33141",
+      "type": "Residential & Mixed-Use",
+      "design": "Built Form Architecture",
+      "website": "https://palmamiamibeach.com",
+      "content": "<p>Perfectly located in North Beach near the North Shore Park, PALMA Miami Beach features residential and amenity space design that elevate the experience of living in this remarkable community.</p><p>Exclusive amenities include a spectacular third-floor lounge and an open pool area overlooking Indian Creek and Allison Island. Inside, a social lounge is appointed with a large TV that is ideal for a relaxed movie night or exciting sporting events. Residents can pursue health and wellness goals in a state-of-the-art fitness center.</p><p>Residences designed with premium finishes feature floor-to-ceiling windows that fill the interiors with natural light and showcase stunning views of the eastern shores of Miami Beach. Residents can enjoy the beautiful views from their private balconies or take a dip in the outdoor pool to cool off on hot days.</p><p>PALMA Miami Beach is conveniently located near a range of shops, restaurants, and other amenities. It is just a short walk from the North Shore Park, where residents can enjoy a range of outdoor activities such as swimming, picnicking, and biking.</p>",
+      "featuredVideo": "/videos/palma.mp4",
+      "featuredImage": "/images/portfolio/palma-featured.png",
+      "gallery": [
+        "/images/portfolio/palma-1.webp",
+        "/images/portfolio/palma-2.webp"
+      ],
+      "highlights": ["14 Stories", "126 Condominium Residences"]
+    },
+    {
+      "id": 3,
+      "slug": "72-carlyle",
+      "title": "72 Carlyle",
+      "location": "Miami Beach, FL",
+      "address": "72nd & Carlyle Miami Beach, FL 33141",
+      "type": "Luxury Condominiums and Retail",
+      "design": "Lissoni",
+      "website": "https://72carlyle.com",
+      "content": "<p>This transformative residential address, designed by Piero Lissoni and featuring architecture by Arquitectonia, is ideally positioned between the beach and Biscayne Bay in Miami Beach. Residences with floor-to-ceiling windows open to expansive private balconies, providing effortlessly elegant indoor-outdoor living and exceptional tropical views.</p><p>A collection of enriching amenities create an atmosphere of luxury, excitement, and relaxation. Residents are greeted in a porte cochère with a garden and the soothing sounds of a water feature. Indoor amenities include a café, a social lounge, a work lounge, a wine room with a chef’s tasting table, a music library, and a children’s playroom. Fitness and wellness amenities include a spa, a yoga studio, and a gym. Outdoor amenities include the Grove Lounge, a swimming pool, hot and cold plunge pools, and a paddle court. Located just south of Surfside, no more than a three-minute stroll to the white sandy beach and moments from premier shopping at Bal Harbour, 72 Carlyle Maimi Beach Residences offers an idyllic tropical residential lifestyle.</p>",
+      "featuredVideo": "/videos/72-carlyle.mp4",
+      "featuredImage": "/images/portfolio/72-carlyle-featured.png",
+      "gallery": [
+        "/images/portfolio/72-carlyle-1.png",
+        "/images/portfolio/72-carlyle-2.png",
+        "/images/portfolio/72-carlyle-3.png"
+      ],
+      "highlights": ["19 Stories", "134 Residences", "472,769 SF"]
+    },
+    {
+      "id": 4,
+      "slug": "880-71st-street",
+      "title": "880 71st Street",
+      "location": "Miami, FL",
+      "address": "880 71st Street Miami Beach",
+      "type": "20-story multifamily rental tower with ground-floor retail",
+      "content": "<p>The property is situated along the tranquil waters of Indian Creek and Biscayne Bay, offering a new benchmark for rental living in the heart of Normandy Isle. Rising 20 stories, the tower will deliver 120 multifamily units, including 48 workforce residences, complemented by ground-floor retail and an elevated amenity space with panoramic views. Residents will enjoy a mix of spacious studios to two-bedroom layouts, ranging from 520 to over 1,300 square feet, many featuring private balconies with stunning vistas across the Bay.</p><p>By leveraging the Florida Live Local Act, this project brings meaningful workforce housing to a high-opportunity neighborhood, delivering affordability without compromise on quality, views, or location.</p>",
+      "featuredImage": "/images/portfolio/880-featured.jpg",
+      "gallery": ["/images/portfolio/880-1.jpg", "/images/portfolio/880-2.jpg"],
+      "highlights": [
+        "Prime location along Indian Creek and Biscayne Bay in Normandy Isle",
+        "Elevated amenity space with panoramic views",
+        "Mix of spacious studios to two-bedroom layouts",
+        "Ground – Floor Retail",
+        "20 Stories",
+        "120 residences, including 48 workforce residences",
+        "Unit sizes range from 520 to over 1,300 sq ft"
+      ]
+    },
+    {
+      "id": 5,
+      "slug": "1826-collins",
+      "title": "1826 Collins",
+      "location": "Miami Beach, FL",
+      "address": "1826 Collins Avenue Miami Beach, FL",
+      "type": "15-story mixed-use residential and office tower",
+      "content": "<p>The development is designed to meet Live Local Act workforce housing incentives and provide new housing opportunities within the Lincoln Road and the Art Deco District neighborhood. The 15-story mixed-use tower includes 29 residential units, one floor of office space, and a rooftop amenity area. Residential units range from spacious three-bedroom residences of 3,600 square feet to efficient 500-square-foot studios. Upper-level units and the rooftop offer sweeping views of the ocean and Miami Beach skyline.</p>",
+      "featuredImage": "/images/portfolio/1826-featured.jpg",
+      "gallery": [
+        "/images/portfolio/1826-1.jpg",
+        "/images/portfolio/1826-2.jpg"
+      ],
+      "highlights": [
+        "Elevated amenity space with panoramic views",
+        "Mix of spacious studios to two-bedroom layouts",
+        "120 Residences, including 48 workforce residences",
+        "Ground-floor Retail Space",
+        "Residence sizes range from 520 to over 1,300 sq ft"
+      ]
+    },
+    {
+      "id": 6,
+      "slug": "800-collins",
+      "title": "800 Collins",
+      "location": "Miami Beach, FL",
+      "address": "800 Collins Avenue Miami Beach, FL 33139",
+      "type": "Retail",
+      "content": "<p>800 Collins is a flagship retail space located in the heart of the dynamic Collins Avenue Fashion District. This state-of-the-art commercial space is designed to be a destination for shoppers and businesses alike.</p><p>Set on a prime corner, 800 Collins boasts 10,000 square feet of retail space spread over two floors. High-end finishes and modern amenities make it an ideal environment for luxury retailers and upscale restaurants to attract discerning shoppers and diners.</p>",
+      "featuredImage": "/images/portfolio/collins-featured.jpg",
+      "highlights": [
+        "2 Stories",
+        "10,000 Square Feet Flagship Retail Space",
+        "7,000 Square Feet Project Site"
+      ]
+    },
+    {
+      "id": 7,
+      "slug": "11th-street",
+      "title": "11th Street",
+      "location": "Miami, FL",
+      "address": "127 NE 11th Street, Miami, FL",
+      "type": "Residential & Mixed-Use",
+      "design": "RSP Arch",
+      "content": "<p>A high-rise mixed-use development opportunity in Miami’s urban core offering up to 1,075 buildable units with direct water and city views and unobstructed views of the Signature Bridge.</p><p>Property is located steps to the Kaseya Center, home of the Miami Heat, Museum Park, and a plethora of iconic cultural institutions.</p><p>Metromover and connection to Brightline make this a highly transit-oriented location, and proximity to Downtown allows for immediate access to Miami’s main business hub.</p>",
+      "featuredImage": "/images/portfolio/11th-featured.jpg",
+      "gallery": [
+        "/images/portfolio/11th-1.jpg",
+        "/images/portfolio/11th-2.jpg",
+        "/images/portfolio/11th-3.jpg"
+      ],
+      "highlights": [
+        "Offering 1,000+ buildable units",
+        "1,000+ Parking Spaces",
+        "160 Hotel Rooms + 34,000 SF hotel amenities",
+        "529 Condos + 135 Penthouses",
+        "550 Apartments",
+        "13,800 Club/Retail Space"
+      ]
+    },
+    {
+      "id": 8,
+      "slug": "54-flagler",
+      "title": "54 Flagler",
+      "location": "Miami, FL",
+      "address": "54 W Flagler St  Miami, FL 33130",
+      "type": "Residential & Mixed-Use",
+      "design": "Stantec",
+      "content": "<p>Coming Soon</p>",
+      "featuredImage": "/images/portfolio/54-featured.png",
+      "gallery": ["/images/portfolio/54-1.webp", "/images/portfolio/54-2.webp"]
+    },
+    {
+      "id": 9,
+      "slug": "565-broome-street",
+      "title": "565 Broome Street",
+      "location": "New York, NY",
+      "address": "565 Broome Street  New York, NY 10013",
+      "type": "Residential & Mixed-Use",
+      "design": "Renzo Piano Building Workshop",
+      "content": "<p>565 Broome Street in the heart of New York City's stylish SoHo neighborhood is a fresh landmark co-developed by Lefferts. This remarkable zero-waste high-rise, designed by renowned architect Renzo Piano, exudes exceptional craftsmanship and luxury.</p><p>The building itself, Piano's first residential building in New York City, is an architectural masterpiece. Curved glass corners stretch serenely upwards and residents of the impeccably designed apartments enjoy access to a range of first-class amenities. In addition to a 55-foot indoor swimming pool, fitness center, and spa with sauna and steam rooms, the building also features an interior landscaped lounge, library, and wet bar, providing residents with a range of spaces to relax and unwind.</p><p>565 Broome Street is conveniently located in the heart of SoHo, a neighborhood known for its vibrant arts scene, upscale shops, and dining options. Residents can easily walk or take public transportation to enjoy all that the area has to offer.</p>",
+      "featuredImage": "/images/portfolio/broome-featured.png",
+      "gallery": [
+        "/images/portfolio/broome-1.webp",
+        "/images/portfolio/broome-2.webp",
+        "/images/portfolio/broome-3.webp",
+        "/images/portfolio/broome-4.webp",
+        "/images/portfolio/broome-5.webp"
+      ],
+      "highlights": [
+        "30 Stories",
+        "112 Residences",
+        "330,000 Square Feet Residential Building"
+      ]
+    },
+    {
+      "id": 10,
+      "slug": "astoria-north",
+      "title": "Astoria North",
+      "location": "New York, NY",
+      "address": "3-15 26th Avenue  Astoria, Queens County, New York",
+      "type": "Residential & Mixed-Use",
+      "design": "Hillwest and Fogarty Finger",
+      "content": "<p>Astoria North, a new development in Astoria Queens, is transforming a once-industrial waterfront district into a vibrant and thriving neighborhood for people of all ages and backgrounds. The development, which is being carefully and collaboratively planned, will feature affordable homes, a waterfront park, open spaces, and retail and community opportunities. Beyond creating a new destination for residents and visitors, it will also help to revitalize the surrounding area and support the growth of the local community.</p><p>One of the standout features of Astoria North is the waterfront park, which will provide a beautiful and inviting space for residents to enjoy the outdoors. The park will feature walking and biking trails, playgrounds, and grassy areas for picnics and other activities. It will also offer stunning views of the East River and the surrounding cityscape.</p><p>A variety of retail and community opportunities, such as shops, restaurants, and services will also be included. These businesses will provide employment and support the local economy, while also offering convenient amenities for residents.</p>",
+      "featuredImage": "/images/portfolio/astoria-featured.jpg",
+      "gallery": ["/images/portfolio/astoria-1.jpg"],
+      "highlights": [
+        "1337 Residences",
+        "1.3 Million Square Feet Located on 3.7 Acres"
+      ]
+    },
+    {
+      "id": 11,
+      "slug": "the-leonard",
+      "title": "The Leonard",
+      "location": "New York, NY",
+      "address": "101 Leonard Street  New York, NY 10013",
+      "type": "Residential & Mixed-Use",
+      "design": "SLCE Architects",
+      "content": "<p>The Leonard, co-developed by Lefferts, is a luxurious residential development located in the heart of Lower Manhattan's chic TriBeCa neighborhood. This elegant 1920s building with a neo-classical brick and limestone façade was meticulously reimagined by SLCE Architects as a 66-unit boutique condominium with contemporary loft-style apartments and a curated collection of amenities.</p><p>One- to three-bedroom residences and penthouses feature soaring ceiling heights from 10.5 to 18 feet high. Interiors with gourmet eat-in kitchens and in-unit laundry machines are finished with premium materials and appliances, providing residents with a truly luxurious living experience.</p><p>Standout amenities of The Leonard include the common roof deck, which offers breathtaking views of some of New York City's most iconic buildings. Other amenities include a fitness center, a children's playroom, and a central laundry room.</p>",
+      "featuredImage": "/images/portfolio/leonard-featured.png",
+      "gallery": [
+        "/images/portfolio/leonard-1.webp",
+        "/images/portfolio/leonard-2.webp",
+        "/images/portfolio/leonard-3.webp",
+        "/images/portfolio/leonard-4.webp",
+        "/images/portfolio/leonard-5.webp",
+        "/images/portfolio/leonard-6.webp"
+      ],
+      "highlights": [
+        "2 Stories",
+        "66 Boutique Residences",
+        "140,000 Square Feet Residential Building"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ContactForm from '../components/ContactForm.astro';
+---
+
+<Layout title="Contact - Lefferts" description="Get in touch with our team">
+  <div class="hero-section contact">
+    <div class="hero-vid">
+      <video playsinline autoplay muted loop>
+        <source src="/videos/contact.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="hero-content">
+      <h1>Contact Us.</h1>
+    </div>
+  </div>
+  
+  <div class="form-vid-wrapper">
+    <ContactForm />
+    <video playsinline autoplay muted loop>
+      <source src="/videos/contact.mp4" type="video/mp4" />
+    </video>
+  </div>
+</Layout>

@@ -1,0 +1,37 @@
+---
+// Static stats data - can be made dynamic later
+const stats = [
+  {
+    number: "3",
+    suffix: "Million",
+    prefix: "+",
+    description: "GROSS SQUARE FEET OF DESTINATION DEVELOPMENTS",
+    className: "mil"
+  },
+  {
+    number: "24",
+    suffix: "",
+    prefix: "",
+    description: "YEARS OF EXPERIENCE",
+    className: ""
+  },
+  {
+    number: "1.5",
+    suffix: "Billion",
+    prefix: "",
+    description: "IN REAL ESTATE INVESTMENTS",
+    className: "bil"
+  }
+];
+---
+
+<div class="stats">
+  {stats.map((stat) => (
+    <div class="statistic" data-module="countup">
+      <h3 class={stat.className} data-countup-number={stat.number}>
+        {stat.number}
+      </h3>
+      <p>{stat.description}</p>
+    </div>
+  ))}
+</div>
