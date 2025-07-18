@@ -150,6 +150,162 @@ function initHidePress() {
     }
 }
 
+// Video initialization and management
+function initVideoHandling() {
+    const videos = document.querySelectorAll('video');
+    
+    videos.forEach(video => {
+        // Force video properties for Safari
+        video.muted = true;
+        video.playsInline = true;
+        video.autoplay = true;
+        
+        // Add event listeners for better control
+        video.addEventListener('loadedmetadata', () => {
+            // Ensure video can play
+            const playPromise = video.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log('Video autoplay failed:', error);
+                    // Fallback: try to play when user interacts
+                    document.addEventListener('click', () => {
+                        video.play().catch(e => console.log('Manual play failed:', e));
+                    }, { once: true });
+                });
+            }
+        });
+
+        // Handle video load errors
+        video.addEventListener('error', (e) => {
+            console.error('Video error:', e);
+        });
+
+        // Ensure video loops properly
+        video.addEventListener('ended', () => {
+            video.currentTime = 0;
+            video.play().catch(e => console.log('Loop play failed:', e));
+        });
+    });
+}
+
+// Hero video specific handling
+function initHeroVideo() {
+    const heroVideo = document.querySelector('.hero-vid video');
+    
+    if (heroVideo) {
+        console.log('Initializing hero video');
+        
+        // Reset video state
+        heroVideo.currentTime = 0;
+        heroVideo.muted = true;
+        heroVideo.playsInline = true;
+        heroVideo.autoplay = true;
+        heroVideo.loop = true;
+        
+        // Force load the video
+        heroVideo.load();
+        
+        // Try to play when ready
+        const attemptPlay = () => {
+            const playPromise = heroVideo.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log('Hero video playing successfully');
+                    })
+                    .catch(error => {
+                        console.log('Hero video autoplay failed, will try on interaction:', error);
+                        
+                        // Fallback: play on any user interaction
+                        const playOnInteraction = () => {
+                            heroVideo.play()
+                                .then(() => {
+                                    console.log('Hero video started on user interaction');
+                                    document.removeEventListener('click', playOnInteraction);
+                                    document.removeEventListener('touchstart', playOnInteraction);
+                                })
+                                .catch(e => console.log('Manual hero video play failed:', e));
+                        };
+                        
+                        document.addEventListener('click', playOnInteraction, { once: true });
+                        document.addEventListener('touchstart', playOnInteraction, { once: true });
+                    });
+            }
+        };
+
+        // Wait for video to be ready
+        if (heroVideo.readyState >= 3) {
+            // Video is ready
+            attemptPlay();
+        } else {
+            // Wait for video to load
+            heroVideo.addEventListener('canplay', attemptPlay, { once: true });
+            heroVideo.addEventListener('loadeddata', attemptPlay, { once: true });
+        }
+    }
+}
+
+// Enhanced view transition handling
+function handleViewTransitionVideos() {
+    // Force reinitialize videos after view transition
+    setTimeout(() => {
+        initVideoHandling();
+        initHeroVideo();
+    }, 100);
+    
+    // Additional delay for Safari
+    setTimeout(() => {
+        const heroVideo = document.querySelector('.hero-vid video');
+        if (heroVideo && heroVideo.paused) {
+            console.log('Hero video still paused, attempting restart');
+            heroVideo.currentTime = 0;
+            heroVideo.play().catch(e => console.log('Delayed play attempt failed:', e));
+        }
+    }, 500);
+}
+
+// Page visibility handling (Safari specific)
+function handlePageVisibility() {
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            // Page became visible again
+            setTimeout(() => {
+                const videos = document.querySelectorAll('video');
+                videos.forEach(video => {
+                    if (video.paused) {
+                        video.play().catch(e => console.log('Visibility play failed:', e));
+                    }
+                });
+            }, 200);
+        }
+    });
+}
+
+// Safari-specific fixes
+function applySafariFixes() {
+    // Check if Safari
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    
+    if (isSafari) {
+        console.log('Safari detected, applying video fixes');
+        
+        // Force video attributes in Safari
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+            video.setAttribute('webkit-playsinline', 'true');
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('muted', 'true');
+            video.setAttribute('autoplay', 'true');
+            
+            // Safari sometimes needs explicit width/height
+            if (!video.style.width) {
+                video.style.width = '100%';
+                video.style.height = '100%';
+            }
+        });
+    }
+}
+
 // Gallery modal functionality - CLEAN VERSION
 function initGalleryModal() {
     const modal = document.getElementById('galleryModal');
@@ -502,17 +658,409 @@ function loadGlide() {
     });
 }
 
-// Re-initialize functionality after view transitions - FIXED TO INCLUDE HERO
+// Load GSAP and ScrollTrigger
+function loadGSAP() {
+    return new Promise((resolve, reject) => {
+        if (typeof gsap !== 'undefined') {
+            resolve();
+            return;
+        }
+
+        // Load GSAP core
+        const gsapScript = document.createElement('script');
+        gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+        gsapScript.onload = () => {
+            // Load ScrollTrigger plugin
+            const scrollTriggerScript = document.createElement('script');
+            scrollTriggerScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
+            scrollTriggerScript.onload = () => {
+                gsap.registerPlugin(ScrollTrigger);
+                resolve();
+            };
+            scrollTriggerScript.onerror = () => reject(new Error('Failed to load ScrollTrigger'));
+            document.head.appendChild(scrollTriggerScript);
+        };
+        gsapScript.onerror = () => reject(new Error('Failed to load GSAP'));
+        document.head.appendChild(gsapScript);
+    });
+}
+
+// Initialize all homepage animations
+function initHomepageAnimations() {
+    if (typeof gsap === 'undefined') {
+        console.warn('GSAP not loaded, skipping animations');
+        return;
+    }
+
+    // Only run animations on homepage
+    const isHomePage = window.location.pathname === "/" || window.location.pathname === "/index.html";
+    if (!isHomePage) return;
+
+    // Clear any existing ScrollTriggers to prevent duplicates
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+
+    // 1. Hero Section Animations
+    animateHero();
+    // 2. Heading Text Animation
+    animateHeadingText();
+    // 3. Stats Animation (with existing number counter)
+    animateStats();
+    // 4. Featured Properties Animation
+    animateFeaturedProperties();
+    // 5. Textbox Animations
+    animateTextboxes();
+
+    // Refresh ScrollTrigger after all animations are set up
+    ScrollTrigger.refresh();
+}
+
+// Hero Section Animation
+function animateHero() {
+    const heroContent = document.querySelector('.hero-content h1');
+    const heroArrow = document.querySelector('.arrow');
+    const heroVideo = document.querySelector('.hero-vid video');
+    
+    if (!heroContent) return;
+
+    // Set initial states
+    gsap.set(heroContent, {
+        opacity: 0,
+        y: 50,
+        scale: 0.9,
+    });
+    
+    if (heroArrow) {
+        gsap.set(heroArrow, {
+            opacity: 0,
+            y: 30,
+        });
+    }
+
+    if (heroVideo) {
+        gsap.set(heroVideo, {
+            scale: 1.1,
+            opacity: 1,
+        });
+    }
+
+    // Create timeline for hero animations
+    const heroTl = gsap.timeline({
+        delay: 0.5, // Small delay for page load
+    });
+
+    // Animate video first
+    if (heroVideo) {
+        heroTl.to(heroVideo, {
+            scale: 1,
+            opacity: 1,
+            duration: 2,
+            ease: 'power2.out',
+        });
+    }
+
+    // Animate hero text
+    heroTl.to(heroContent, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 1.2,
+        ease: 'power2.out',
+    }, '-=1.5'); // Start before video finishes
+
+    // Animate arrow
+    if (heroArrow) {
+        heroTl.to(heroArrow, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+        }, '-=0.5');
+    }
+}
+
+// Heading Text Animation
+function animateHeadingText() {
+    const headingText = document.querySelector('.heading-txt h2');
+    
+    if (!headingText) return;
+
+    gsap.set(headingText, {
+        opacity: 0,
+        y: 40,
+    });
+
+    gsap.to(headingText, {
+        opacity: 1,
+        y: 0,
+        duration: 1,
+        ease: 'power2.out',
+        scrollTrigger: {
+            trigger: '.heading-txt',
+            start: 'top 80%',
+            end: 'bottom 20%',
+            toggleActions: 'play none none reverse',
+        },
+    });
+}
+
+// Stats Animation (preserving existing counter functionality)
+function animateStats() {
+    const statsContainer = document.querySelector('.stats');
+    const statItems = document.querySelectorAll('.statistic');
+    
+    if (!statsContainer || !statItems.length) return;
+
+    // Set initial states
+    statItems.forEach((stat) => {
+        gsap.set(stat, {
+            opacity: 0,
+            y: 60,
+            scale: 0.8,
+        });
+    });
+
+    // Create staggered animation
+    gsap.to(statItems, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: 'power2.out',
+        scrollTrigger: {
+            trigger: statsContainer,
+            start: 'top 75%',
+            end: 'bottom 25%',
+            toggleActions: 'play none none reverse',
+        },
+    });
+}
+
+// Featured Properties Animation
+function animateFeaturedProperties() {
+    const propertiesContainer = document.querySelector('.property-imgs');
+    const propertyItems = document.querySelectorAll('.property-home');
+    const propertyDivider = document.querySelector('.property-divider');
+    
+    if (!propertiesContainer || !propertyItems.length) return;
+
+    // Set initial states
+    propertyItems.forEach((property, index) => {
+        const img = property.querySelector('img');
+        const text = property.querySelector('p');
+        
+        if (img) {
+            gsap.set(img, {
+                opacity: 0,
+                scale: 1.1,
+                y: 50,
+            });
+        }
+        
+        if (text) {
+            gsap.set(text, {
+                opacity: 0,
+                y: 20,
+            });
+        }
+    });
+
+    if (propertyDivider) {
+        gsap.set(propertyDivider, {
+            opacity: 0,
+            scaleY: 0,
+        });
+    }
+
+    // Create timeline for properties
+    const propertiesTl = gsap.timeline({
+        scrollTrigger: {
+            trigger: propertiesContainer,
+            start: 'top 70%',
+            end: 'bottom 30%',
+            toggleActions: 'play none none reverse',
+        },
+    });
+
+    // Animate first property
+    const firstProperty = propertyItems[0];
+    if (firstProperty) {
+        const firstImg = firstProperty.querySelector('img');
+        const firstText = firstProperty.querySelector('p');
+        
+        if (firstImg) {
+            propertiesTl.to(firstImg, {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 1,
+                ease: 'power2.out',
+            });
+        }
+        
+        if (firstText) {
+            propertiesTl.to(firstText, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: 'power2.out',
+            }, '-=0.3');
+        }
+    }
+
+    // Animate divider
+    if (propertyDivider) {
+        propertiesTl.to(propertyDivider, {
+            opacity: 1,
+            scaleY: 1,
+            duration: 0.8,
+            ease: 'power2.out',
+        }, '-=0.4');
+    }
+
+    // Animate second property
+    const secondProperty = propertyItems[1];
+    if (secondProperty) {
+        const secondImg = secondProperty.querySelector('img');
+        const secondText = secondProperty.querySelector('p');
+        
+        if (secondImg) {
+            propertiesTl.to(secondImg, {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 1,
+                ease: 'power2.out',
+            }, '-=0.6');
+        }
+        
+        if (secondText) {
+            propertiesTl.to(secondText, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                ease: 'power2.out',
+            }, '-=0.3');
+        }
+    }
+}
+
+// Textbox Animations
+function animateTextboxes() {
+    const textboxes = document.querySelectorAll('.textbox');
+    
+    if (!textboxes.length) return;
+
+    textboxes.forEach((textbox, index) => {
+        const heading = textbox.querySelector('h3');
+        const content = textbox.querySelector('.textbox-content');
+        
+        if (!heading || !content) return;
+
+        // Set initial states
+        gsap.set(heading, {
+            opacity: 0,
+            x: -50,
+            y: 30,
+        });
+        
+        gsap.set(content, {
+            opacity: 0,
+            x: 50,
+            y: 30,
+        });
+
+        // Create timeline for each textbox
+        const textboxTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: textbox,
+                start: 'top 75%',
+                end: 'bottom 25%',
+                toggleActions: 'play none none reverse',
+            },
+        });
+
+        // Animate heading
+        textboxTl.to(heading, {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+        });
+
+        // Animate content
+        textboxTl.to(content, {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out',
+        }, '-=0.4');
+
+        // Add subtle animation to content paragraphs
+        const paragraphs = content.querySelectorAll('p, h4, ul');
+        if (paragraphs.length) {
+            gsap.set(paragraphs, {
+                opacity: 0,
+                y: 20,
+            });
+            
+            textboxTl.to(paragraphs, {
+                opacity: 1,
+                y: 0,
+                duration: 0.6,
+                stagger: 0.1,
+                ease: 'power2.out',
+            }, '-=0.2');
+        }
+    });
+}
+
+// Function to reinitialize animations after page transitions
+function reinitializeAnimations() {
+    // Kill existing ScrollTriggers
+    if (typeof ScrollTrigger !== 'undefined') {
+        ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    }
+    
+    // Reinitialize animations
+    setTimeout(() => {
+        initHomepageAnimations();
+    }, 100);
+}
+
+// Enhanced ready function that includes GSAP initialization
+async function initializeWithAnimations() {
+    try {
+        // Load GSAP first
+        await loadGSAP();
+        
+        // Initialize animations
+        initHomepageAnimations();
+        
+        console.log('GSAP animations initialized successfully');
+    } catch (error) {
+        console.error('Error loading GSAP:', error);
+        console.log('Continuing without animations');
+    }
+}
+
+// Updated reinitializeAfterTransition function with video handling
 function reinitializeAfterTransition() {
     initMobileMenu();
     initShowArticles();
-    initHeroScrollEffects(); // ← THIS WAS MISSING!
+    initHeroScrollEffects();
     initReadMore();
     initHidePress();
     initCountUp();
     initSmoothScroll();
     initNewsletterForm();
     initContactForm();
+    
+    // Video handling
+    handleViewTransitionVideos();
+    applySafariFixes();
     
     // Re-initialize sliders and gallery modal after a delay
     setTimeout(() => {
@@ -527,7 +1075,7 @@ ready(async () => {
         // Load Glide.js first
         await loadGlide();
         
-        // Initialize all functionality
+        // Initialize all existing functionality
         initMobileMenu();
         initShowArticles();
         initHeroScrollEffects();
@@ -539,17 +1087,38 @@ ready(async () => {
         initContactForm();
         initGlideSliders();
         
-        // Initialize gallery modal last
+        // Initialize video handling
+        initVideoHandling();
+        initHeroVideo();
+        applySafariFixes();
+        handlePageVisibility();
+        
+        // Initialize gallery modal
         setTimeout(() => {
             initGalleryModal();
         }, 100);
         
-        // Listen for view transitions (if using Astro view transitions)
-        document.addEventListener('astro:after-swap', reinitializeAfterTransition);
+        // Initialize GSAP animations
+        await initializeWithAnimations();
+        
+        // Listen for view transitions with enhanced video handling
+        document.addEventListener('astro:after-swap', () => {
+            reinitializeAfterTransition();
+            reinitializeAnimations();
+        });
+        
+        // Additional Safari-specific event listeners
+        document.addEventListener('astro:before-preparation', () => {
+            // Pause videos before transition to avoid conflicts
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.pause();
+            });
+        });
         
     } catch (error) {
         console.error('Error initializing application:', error);
-        // Initialize everything except sliders if Glide fails to load
+        // Initialize everything except sliders and animations if libraries fail
         initMobileMenu();
         initShowArticles();
         initHeroScrollEffects();
@@ -559,9 +1128,15 @@ ready(async () => {
         initSmoothScroll();
         initNewsletterForm();
         initContactForm();
+        initVideoHandling();
+        initHeroVideo();
     }
 });
 
 // Make functions globally available for manual re-initialization
 window.reinitializeSliders = initGlideSliders;
 window.reinitializeGallery = initGalleryModal;
+window.reinitializeAnimations = reinitializeAnimations;
+window.initHomepageAnimations = initHomepageAnimations;
+window.initVideoHandling = initVideoHandling;
+window.initHeroVideo = initHeroVideo;

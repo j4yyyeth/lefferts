@@ -1,7 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { ClientRouter } from 'astro:transitions';
+import { ViewTransitions } from 'astro:transitions';
 
 export interface Props {
   title: string;
@@ -27,24 +27,39 @@ const { title, description = '', isHome = false } = Astro.props;
   <link rel="preload" href="/fonts/neue-l.ttf" as="font" type="font/ttf" crossorigin />
   <link rel="preload" href="/fonts/neue-m.ttf" as="font" type="font/ttf" crossorigin />
   
-  <!-- Use ClientRouter instead of ClientRouter for better cross-browser support -->
-  <ClientRouter />
+  <!-- View Transitions -->
+  <ViewTransitions />
   
   <style>
-    /* Add CSS to help with transition smoothness across browsers */
+    /* Enhanced transition styles for Safari */
     html {
       view-transition-name: none;
     }
     
+    /* Ensure videos don't interfere with transitions */
+    video {
+      view-transition-name: none;
+    }
+    
     /* Ensure images are ready for transitions */
-    img[data-astro-transition-persist] {
+    img[transition\:name] {
       view-transition-name: var(--transition-name);
     }
     
-    /* Fallback for browsers without native support */
+    /* Smooth transitions for all browsers */
     @media (prefers-reduced-motion: no-preference) {
-      html:not(.astro-view-transitions-fallback) {
+      html {
         view-transition-name: root;
+      }
+    }
+
+    /* Safari-specific video fixes */
+    @supports (-webkit-appearance: none) {
+      video {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
       }
     }
   </style>
@@ -59,24 +74,85 @@ const { title, description = '', isHome = false } = Astro.props;
   <script>
     import '../scripts/main.js';
     
-    // Enhanced view transition handling for Safari/Firefox
-    document.addEventListener('astro:before-preparation', () => {
-      // Ensure all images are loaded before transition
-      const images = document.querySelectorAll('img[data-astro-transition-persist]');
-      images.forEach(img => {
-        if (!img.complete) {
-          img.addEventListener('load', () => {
-            // Image loaded, safe to transition
-          });
+    // Enhanced Safari-specific video handling
+    document.addEventListener('astro:before-preparation', (e) => {
+      // Pause all videos before transition to prevent Safari issues
+      const videos = document.querySelectorAll('video');
+      videos.forEach(video => {
+        if (!video.paused) {
+          video.pause();
+          // Store the current time for resume
+          video.dataset.pausedAt = video.currentTime.toString();
         }
       });
     });
 
-    // Handle transition fallbacks
     document.addEventListener('astro:after-swap', () => {
-      // Re-initialize any scripts that need it after page swap
-      if (typeof window.initializeSliders === 'function') {
-        window.initializeSliders();
+      // Enhanced video restart for Safari
+      setTimeout(() => {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+          // Reset video properties
+          video.muted = true;
+          video.playsInline = true;
+          video.autoplay = true;
+          
+          // Restart from beginning for hero video
+          if (video.closest('.hero-vid')) {
+            video.currentTime = 0;
+            video.load(); // Force reload in Safari
+          }
+          
+          // Attempt to play
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.log('Video restart failed after transition:', error);
+              
+              // Fallback: play on next user interaction
+              document.addEventListener('click', () => {
+                video.play().catch(e => console.log('Click play failed:', e));
+              }, { once: true });
+            });
+          }
+        });
+      }, 150);
+      
+      // Re-initialize scripts
+      if (typeof window.reinitializeSliders === 'function') {
+        window.reinitializeSliders();
+      }
+      if (typeof window.initVideoHandling === 'function') {
+        window.initVideoHandling();
+      }
+      if (typeof window.initHeroVideo === 'function') {
+        window.initHeroVideo();
+      }
+    });
+
+    // Handle page focus events (Safari specific)
+    window.addEventListener('focus', () => {
+      setTimeout(() => {
+        const heroVideo = document.querySelector('.hero-vid video');
+        if (heroVideo && heroVideo.paused) {
+          heroVideo.play().catch(e => console.log('Focus play failed:', e));
+        }
+      }, 100);
+    });
+
+    // Handle page show event (back/forward navigation)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        // Page was restored from cache
+        setTimeout(() => {
+          const videos = document.querySelectorAll('video');
+          videos.forEach(video => {
+            if (video.paused) {
+              video.currentTime = 0;
+              video.play().catch(e => console.log('Pageshow play failed:', e));
+            }
+          });
+        }, 200);
       }
     });
   </script>
