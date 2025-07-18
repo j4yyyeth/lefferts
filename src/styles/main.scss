@@ -1899,12 +1899,14 @@ footer {
     gap: 0;
     margin: 0;
     padding: 0;
+    list-style: none;
   }
 
   .glide__slide {
     min-width: 0;
     flex: none;
     margin: 0 5px !important;
+    list-style: none;
   }
 
   .glide__arrows {
@@ -2302,6 +2304,7 @@ footer {
     align-items: center;
     justify-content: center;
     min-height: 70vh;
+    list-style: none;
 
     img,
     video {
@@ -2463,6 +2466,7 @@ footer {
     align-items: center;
     justify-content: center;
     min-height: 70vh;
+    list-style: none;
 
     img,
     video {
@@ -2881,4 +2885,8 @@ button.show-articles {
     font-style: italic;
     color: #666;
   }
+}
+
+.page-main:has(.hero-section.contact) {
+  min-height: unset;
 }
