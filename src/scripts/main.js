@@ -99,31 +99,81 @@ function initHeroScrollEffects() {
 }
 
 // Read more property info functionality
+// FIXED Read more property info functionality
 function initReadMore() {
-    const readMoreBtn = document.querySelector(".read-more-property");
+    // Remove any existing event listeners first
+    const existingReadMoreBtns = document.querySelectorAll('.read-more-property');
+    existingReadMoreBtns.forEach(btn => {
+        btn.replaceWith(btn.cloneNode(true));
+    });
+    
+    // Get fresh references
+    const readMoreBtn = document.querySelector('.read-more-property');
     
     if (readMoreBtn) {
-        const paragraphs = document.querySelectorAll(".property-info p:not(:first-of-type)");
+        console.log('Read More button found:', readMoreBtn);
         
-        readMoreBtn.addEventListener("click", function () {
-            const isHidden = paragraphs[0].style.display === "none" || paragraphs[0].style.display === "";
-            
-            paragraphs.forEach((p) => {
-                if (isHidden) {
-                    p.style.display = "block";
-                    setTimeout(() => {
-                        p.style.opacity = "1";
-                    }, 10);
-                } else {
-                    p.style.opacity = "0";
-                    setTimeout(() => {
-                        p.style.display = "none";
-                    }, 150);
-                }
-            });
-            
-            readMoreBtn.textContent = isHidden ? "Read Less" : "Read More";
+        // Find all paragraphs in property-info that are NOT the first one
+        const propertyInfo = document.querySelector('.property-info');
+        if (!propertyInfo) {
+            console.log('Property info container not found');
+            return;
+        }
+        
+        const allParagraphs = propertyInfo.querySelectorAll('p');
+        console.log('Total paragraphs found:', allParagraphs.length);
+        
+        // Get all paragraphs except the first one
+        const hiddenParagraphs = Array.from(allParagraphs).slice(1);
+        console.log('Hidden paragraphs found:', hiddenParagraphs.length);
+        
+        if (hiddenParagraphs.length === 0) {
+            console.log('No hidden paragraphs found, hiding read more button');
+            readMoreBtn.style.display = 'none';
+            return;
+        }
+        
+        // Set initial state - hide all paragraphs except the first
+        hiddenParagraphs.forEach(p => {
+            p.style.display = 'none';
+            p.style.opacity = '0';
+            p.style.transition = 'opacity 0.3s ease';
         });
+        
+        // Add event listener
+        readMoreBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Read More button clicked');
+            
+            // Check if paragraphs are currently hidden
+            const isHidden = hiddenParagraphs[0].style.display === 'none';
+            console.log('Currently hidden:', isHidden);
+            
+            if (isHidden) {
+                // Show paragraphs
+                hiddenParagraphs.forEach(p => {
+                    p.style.display = 'block';
+                    // Use setTimeout to ensure display change is applied before opacity
+                    setTimeout(() => {
+                        p.style.opacity = '1';
+                    }, 10);
+                });
+                readMoreBtn.textContent = 'Read Less';
+            } else {
+                // Hide paragraphs
+                hiddenParagraphs.forEach(p => {
+                    p.style.opacity = '0';
+                    setTimeout(() => {
+                        p.style.display = 'none';
+                    }, 300); // Match transition duration
+                });
+                readMoreBtn.textContent = 'Read More';
+            }
+        });
+        
+        console.log('Read More functionality initialized successfully');
+    } else {
+        console.log('Read More button not found');
     }
 }
 
