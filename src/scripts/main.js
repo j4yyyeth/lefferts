@@ -113,18 +113,32 @@ function initReadMore() {
     if (readMoreBtn) {
         console.log('Read More button found:', readMoreBtn);
         
-        // Find all paragraphs in property-info that are NOT the first one
+        // Find the property-info container
         const propertyInfo = document.querySelector('.property-info');
         if (!propertyInfo) {
             console.log('Property info container not found');
             return;
         }
         
-        const allParagraphs = propertyInfo.querySelectorAll('p');
-        console.log('Total paragraphs found:', allParagraphs.length);
+        // Only target paragraphs that are direct children of property-info (not in .details section)
+        const directParagraphs = Array.from(propertyInfo.children).filter(child => 
+            child.tagName === 'P' || (child.matches && child.matches('div') && child.innerHTML.includes('<p>'))
+        );
         
-        // Get all paragraphs except the first one
-        const hiddenParagraphs = Array.from(allParagraphs).slice(1);
+        // If there's a div with content, get paragraphs from it
+        let contentParagraphs = [];
+        const contentDiv = propertyInfo.querySelector('div:not(.details)');
+        if (contentDiv) {
+            contentParagraphs = Array.from(contentDiv.querySelectorAll('p'));
+        } else {
+            // Fallback: get direct paragraph children
+            contentParagraphs = Array.from(propertyInfo.children).filter(child => child.tagName === 'P');
+        }
+        
+        console.log('Content paragraphs found:', contentParagraphs.length);
+        
+        // Get all paragraphs except the first one (only from content, not details)
+        const hiddenParagraphs = contentParagraphs.slice(1);
         console.log('Hidden paragraphs found:', hiddenParagraphs.length);
         
         if (hiddenParagraphs.length === 0) {
@@ -133,7 +147,7 @@ function initReadMore() {
             return;
         }
         
-        // Set initial state - hide all paragraphs except the first
+        // Set initial state - hide content paragraphs except the first
         hiddenParagraphs.forEach(p => {
             p.style.display = 'none';
             p.style.opacity = '0';
