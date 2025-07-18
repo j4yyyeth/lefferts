@@ -4,6 +4,13 @@ import ArticleGrid from '../components/ArticleGrid.astro';
 import press from '../data/press.json';
 ---
 
-<Layout title="Press - Lefferts" description="Latest news and press coverage about Lefferts real estate developments">
+<Layout
+  title="Press - Lefferts"
+  description="Latest news and press coverage about Lefferts real estate developments"
+>
   <ArticleGrid articles={press} />
+  <div class="inquiries">
+    <p>Press Inquiries</p>
+    <a href="mailto:press@lefferts.com">press@lefferts.com</a>
+  </div>
 </Layout>
