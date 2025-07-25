@@ -18,6 +18,7 @@ const { property } = Astro.props;
 <Layout
   title={`${property.title} - Lefferts`}
   description={`Learn more about ${property.title}, a premium development by Lefferts.`}
+  disableTransitions={true}
 >
   <PropertyDetail property={property} />
 </Layout>

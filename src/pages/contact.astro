@@ -6,19 +6,186 @@ import ContactForm from '../components/ContactForm.astro';
 <Layout title="Contact - Lefferts" description="Get in touch with our team">
   <div class="hero-section contact">
     <div class="hero-vid">
-      <video playsinline autoplay muted loop>
+      <video
+        playsinline
+        autoplay
+        muted
+        loop
+        preload="metadata"
+        data-contact-hero-video="true"
+        style="width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease;"
+      >
         <source src="/videos/contact.mp4" type="video/mp4" />
       </video>
+      <div
+        class="hero-fallback"
+        style="position: absolute; inset: 0; background: #fff; z-index: -1;"
+      >
+      </div>
     </div>
-    <div class="hero-content">
+    <div
+      class="hero-content"
+      style="opacity: 0; transition: opacity 0.5s ease 0.2s;"
+    >
       <h1>Contact Us.</h1>
     </div>
   </div>
-  
+
   <div class="form-vid-wrapper">
     <ContactForm />
-    <video playsinline autoplay muted loop>
+    <video
+      playsinline
+      autoplay
+      muted
+      loop
+      preload="metadata"
+      data-form-video="true"
+      style="opacity: 0; transition: opacity 0.5s ease;"
+    >
       <source src="/videos/contact.mp4" type="video/mp4" />
     </video>
   </div>
 </Layout>
+
+<script>
+  // Contact page video initialization
+  function initializeContactVideos() {
+    const heroVideo = document.querySelector(
+      '[data-contact-hero-video]'
+    ) as HTMLVideoElement;
+    const formVideo = document.querySelector(
+      '[data-form-video]'
+    ) as HTMLVideoElement;
+    const heroContent = document.querySelector('.hero-content') as HTMLElement;
+
+    // Initialize hero video
+    if (heroVideo) {
+      initializeVideo(heroVideo, () => {
+        // Show hero content after video is ready
+        if (heroContent) {
+          heroContent.style.opacity = '1';
+        }
+      });
+    } else {
+      // No hero video, just show content
+      if (heroContent) {
+        heroContent.style.opacity = '1';
+      }
+    }
+
+    // Initialize form video
+    if (formVideo) {
+      initializeVideo(formVideo);
+    }
+  }
+
+  function initializeVideo(video: HTMLVideoElement, onReady?: () => void) {
+    // Ensure all required attributes are set
+    video.muted = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.loop = true;
+
+    // Safari-specific attributes
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('playsinline', 'true');
+
+    let videoStarted = false;
+
+    // Function to show video smoothly
+    const showVideo = () => {
+      if (!videoStarted) {
+        video.style.opacity = '1';
+        videoStarted = true;
+
+        // Call onReady callback if provided
+        if (onReady) {
+          setTimeout(onReady, 100);
+        }
+      }
+    };
+
+    // Force video to start
+    const startVideo = () => {
+      video.currentTime = 0;
+      const playPromise = video.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Contact video started successfully');
+            showVideo();
+          })
+          .catch((error) => {
+            console.log('Contact video autoplay prevented:', error);
+            // Show video even if autoplay fails
+            showVideo();
+
+            // Try again on user interaction
+            const playOnTouch = () => {
+              video
+                .play()
+                .then(() => {
+                  console.log('Contact video started on interaction');
+                  showVideo();
+                })
+                .catch((e) =>
+                  console.log('Contact video interaction play failed:', e)
+                );
+            };
+
+            document.addEventListener('click', playOnTouch, { once: true });
+            document.addEventListener('touchstart', playOnTouch, {
+              once: true,
+            });
+          });
+      }
+    };
+
+    // Start video when it's ready
+    if (video.readyState >= 2) {
+      startVideo();
+    } else {
+      video.addEventListener('loadeddata', startVideo, { once: true });
+      video.addEventListener(
+        'canplaythrough',
+        () => {
+          if (!videoStarted) startVideo();
+        },
+        { once: true }
+      );
+
+      // Fallback timeout to show video
+      setTimeout(() => {
+        if (!videoStarted) {
+          console.log('Contact video loading timeout, showing anyway');
+          showVideo();
+        }
+      }, 2000);
+    }
+
+    // Handle video errors
+    video.addEventListener('error', (e) => {
+      console.error('Contact video error:', e);
+      showVideo(); // Show video element even on error
+    });
+
+    // Ensure proper looping
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      video.play().catch((e) => console.log('Contact video loop failed:', e));
+    });
+  }
+
+  // Initialize immediately if DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeContactVideos);
+  } else {
+    initializeContactVideos();
+  }
+
+  // Re-initialize after view transitions
+  document.addEventListener('astro:after-swap', () => {
+    setTimeout(initializeContactVideos, 50);
+  });
+</script>

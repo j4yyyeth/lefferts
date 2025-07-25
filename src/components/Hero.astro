@@ -15,20 +15,22 @@ const { text, videoSrc } = Astro.props;
         autoplay 
         muted 
         loop 
-        preload="auto"
+        preload="metadata"
         webkit-playsinline="true"
         data-hero-video="true"
-        style="width: 100%; height: 100%; object-fit: cover;"
+        style="width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease;"
       >
         <source src={videoSrc} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
     )}
+    {/* Fallback background while video loads */}
+    <div class="hero-fallback" style="position: absolute; inset: 0; background: #fff; z-index: -1;"></div>
   </div>
-  <div class="hero-content">
+  <div class="hero-content" style="opacity: 0; transition: opacity 0.5s ease 0.2s;">
     <h1>{text}</h1>
   </div>
-  <div class="arrow">
+  <div class="arrow" style="opacity: 0; transition: opacity 0.5s ease 0.4s;">
     <a href="#site" class="down-arrow" aria-label="Scroll down"></a>
   </div>
 </div>
@@ -36,7 +38,9 @@ const { text, videoSrc } = Astro.props;
 <script>
   // Hero-specific video initialization
   function initializeHeroVideoComponent() {
-    const heroVideo = document.querySelector('[data-hero-video]');
+    const heroVideo = document.querySelector('[data-hero-video]') as HTMLVideoElement;
+    const heroContent = document.querySelector('.hero-content') as HTMLElement;
+    const heroArrow = document.querySelector('.arrow') as HTMLElement;
     
     if (heroVideo) {
       // Ensure all required attributes are set
@@ -49,6 +53,25 @@ const { text, videoSrc } = Astro.props;
       heroVideo.setAttribute('webkit-playsinline', 'true');
       heroVideo.setAttribute('playsinline', 'true');
       
+      let videoStarted = false;
+      
+      // Function to show video smoothly
+      const showVideo = () => {
+        if (!videoStarted) {
+          heroVideo.style.opacity = '1';
+          videoStarted = true;
+          
+          // Show content after video appears with CSS transitions
+          setTimeout(() => {
+            if (heroContent) heroContent.style.opacity = '1';
+          }, 200);
+          
+          setTimeout(() => {
+            if (heroArrow) heroArrow.style.opacity = '1';
+          }, 400);
+        }
+      };
+      
       // Force video to start
       const startVideo = () => {
         heroVideo.currentTime = 0;
@@ -58,14 +81,20 @@ const { text, videoSrc } = Astro.props;
           playPromise
             .then(() => {
               console.log('Hero video started successfully');
+              showVideo();
             })
             .catch(error => {
               console.log('Hero video autoplay prevented:', error);
+              // Show content even if video fails
+              showVideo();
               
               // Try again on user interaction
               const playOnTouch = () => {
                 heroVideo.play()
-                  .then(() => console.log('Hero video started on interaction'))
+                  .then(() => {
+                    console.log('Hero video started on interaction');
+                    showVideo();
+                  })
                   .catch(e => console.log('Hero video interaction play failed:', e));
               };
               
@@ -76,16 +105,27 @@ const { text, videoSrc } = Astro.props;
       };
       
       // Start video when it's ready
-      if (heroVideo.readyState >= 3) {
+      if (heroVideo.readyState >= 2) {
         startVideo();
       } else {
         heroVideo.addEventListener('loadeddata', startVideo, { once: true });
-        heroVideo.addEventListener('canplay', startVideo, { once: true });
+        heroVideo.addEventListener('canplaythrough', () => {
+          if (!videoStarted) startVideo();
+        }, { once: true });
+        
+        // Fallback timeout to show content
+        setTimeout(() => {
+          if (!videoStarted) {
+            console.log('Video loading timeout, showing content anyway');
+            showVideo();
+          }
+        }, 2000);
       }
       
       // Handle video errors
       heroVideo.addEventListener('error', (e) => {
         console.error('Hero video error:', e);
+        showVideo(); // Show content even on error
       });
       
       // Ensure proper looping
@@ -93,14 +133,22 @@ const { text, videoSrc } = Astro.props;
         heroVideo.currentTime = 0;
         heroVideo.play().catch(e => console.log('Hero video loop failed:', e));
       });
+    } else {
+      // No video, just show content
+      if (heroContent) heroContent.style.opacity = '1';
+      if (heroArrow) heroArrow.style.opacity = '1';
     }
   }
   
-  // Initialize immediately
-  initializeHeroVideoComponent();
+  // Initialize immediately if DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeHeroVideoComponent);
+  } else {
+    initializeHeroVideoComponent();
+  }
   
   // Re-initialize after view transitions
   document.addEventListener('astro:after-swap', () => {
-    setTimeout(initializeHeroVideoComponent, 100);
+    setTimeout(initializeHeroVideoComponent, 50);
   });
 </script>

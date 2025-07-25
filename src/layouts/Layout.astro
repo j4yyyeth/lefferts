@@ -7,9 +7,10 @@ export interface Props {
   title: string;
   description?: string;
   isHome?: boolean;
+  disableTransitions?: boolean;
 }
 
-const { title, description = '', isHome = false } = Astro.props;
+const { title, description = '', isHome = false, disableTransitions = false } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -27,8 +28,8 @@ const { title, description = '', isHome = false } = Astro.props;
   <link rel="preload" href="/fonts/neue-l.ttf" as="font" type="font/ttf" crossorigin />
   <link rel="preload" href="/fonts/neue-m.ttf" as="font" type="font/ttf" crossorigin />
   
-  <!-- View Transitions -->
-  <ViewTransitions />
+  <!-- View Transitions - only if not disabled -->
+  {!disableTransitions && <ViewTransitions />}
   
   <style>
     /* Enhanced transition styles for Safari */
@@ -85,49 +86,6 @@ const { title, description = '', isHome = false } = Astro.props;
           video.dataset.pausedAt = video.currentTime.toString();
         }
       });
-    });
-
-    document.addEventListener('astro:after-swap', () => {
-      // Enhanced video restart for Safari
-      setTimeout(() => {
-        const videos = document.querySelectorAll('video');
-        videos.forEach(video => {
-          // Reset video properties
-          video.muted = true;
-          video.playsInline = true;
-          video.autoplay = true;
-          
-          // Restart from beginning for hero video
-          if (video.closest('.hero-vid')) {
-            video.currentTime = 0;
-            video.load(); // Force reload in Safari
-          }
-          
-          // Attempt to play
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.log('Video restart failed after transition:', error);
-              
-              // Fallback: play on next user interaction
-              document.addEventListener('click', () => {
-                video.play().catch(e => console.log('Click play failed:', e));
-              }, { once: true });
-            });
-          }
-        });
-      }, 150);
-      
-      // Re-initialize scripts
-      if (typeof window.reinitializeSliders === 'function') {
-        window.reinitializeSliders();
-      }
-      if (typeof window.initVideoHandling === 'function') {
-        window.initVideoHandling();
-      }
-      if (typeof window.initHeroVideo === 'function') {
-        window.initHeroVideo();
-      }
     });
 
     // Handle page focus events (Safari specific)
