@@ -759,6 +759,7 @@ function handleImagesSidebarLayout() {
 }
 
 // Animated numbers functionality with single-fire protection
+// Fixed CountUp class that preserves CSS pseudo-elements
 class CountUp {
     constructor(el) {
         this.el = el;
@@ -810,12 +811,19 @@ class CountUp {
         const duration = 4500;
         let startTimestamp = null;
 
+        // Store original content structure to preserve CSS styling
+        const hasPrefix = el.classList.contains('mil'); // Has + prefix
+        const hasSuffix = el.classList.contains('mil') || el.classList.contains('bil');
+
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
             const elapsedPercent = (timestamp - startTimestamp) / duration;
             const easedProgress = Math.min(this.easeOutQuint(elapsedPercent), 1);
             let interimNumber = Math.abs(easedProgress * (end - start) + start);
-            el.innerHTML = this.formatNumber(interimNumber, decimals);
+            
+            // Only update the text content, leave CSS pseudo-elements intact
+            el.textContent = this.formatNumber(interimNumber, decimals);
+            
             if (easedProgress < 1) {
                 window.requestAnimationFrame(step);
             }
