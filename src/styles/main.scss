@@ -2981,3 +2981,14 @@ button.show-articles {
     margin: auto 30px;
   }
 }
+
+.header #menu-main li {
+  z-index: 999;
+  a {
+    z-index: 999;
+  }
+}
+
+.main-menu-container {
+  z-index: 999;
+}
