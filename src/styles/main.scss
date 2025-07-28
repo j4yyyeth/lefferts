@@ -1,14 +1,11 @@
-// Variables
 @import 'variables';
 
-// Reset and base styles
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-// Font faces
 @font-face {
   font-family: hudson;
   src: url('/fonts/hudson.ttf');
@@ -33,7 +30,6 @@
   font-display: swap;
 }
 
-// Base styles
 html {
   scroll-behavior: smooth;
 }
@@ -48,7 +44,6 @@ body {
   scroll-behavior: smooth;
 }
 
-// Main layout
 main {
   &.page-main {
     padding-top: 132px;
@@ -74,7 +69,6 @@ main {
   }
 }
 
-// Selection
 ::selection {
   color: $color-white;
   background: $color-black;
@@ -85,7 +79,6 @@ main {
   background: $color-black;
 }
 
-// Header styles
 header {
   position: fixed;
   z-index: 999;
@@ -207,7 +200,6 @@ header {
   }
 }
 
-// Mobile menu - IMPROVED
 .mobile-menu {
   display: none;
 }
@@ -282,7 +274,6 @@ header {
   }
 }
 
-// Animation keyframes for mobile menu
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -305,7 +296,6 @@ header {
   }
 }
 
-// Hero section
 .hero-section {
   position: relative;
   height: 100vh;
@@ -371,7 +361,6 @@ header {
   }
 }
 
-// Arrow
 .arrow {
   position: absolute;
   bottom: 10vh;
@@ -423,7 +412,6 @@ header {
   }
 }
 
-// Heading text
 #site {
   z-index: 9999;
   position: relative;
@@ -455,7 +443,6 @@ header {
   }
 }
 
-// Stats
 .stats {
   display: flex;
   justify-content: center;
@@ -540,7 +527,6 @@ header {
   }
 }
 
-// Property images
 .property-imgs {
   display: flex;
   padding-bottom: 50px;
@@ -608,7 +594,6 @@ header {
   }
 }
 
-// Textbox
 .textbox {
   display: flex;
   padding: 50px 0;
@@ -705,7 +690,6 @@ header {
   }
 }
 
-// Inquiries
 .inquiries {
   display: flex;
   justify-content: center;
@@ -763,7 +747,6 @@ header {
   }
 }
 
-// All buildings grid
 .all-buildings {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -828,7 +811,6 @@ header {
   max-height: 529px;
   max-width: 415px;
 
-  /* Safari fixes */
   min-width: 0;
   width: 100%;
   -webkit-transform: translateZ(0);
@@ -888,7 +870,6 @@ header {
   }
 }
 
-/* Safari-specific additional fix */
 @supports (-webkit-appearance: none) {
   .building-wrapper {
     width: calc(100% - 0px) !important;
@@ -935,7 +916,6 @@ header {
   }
 }
 
-// Content overlay
 .content {
   position: relative;
   margin: auto;
@@ -1003,7 +983,6 @@ header {
   }
 }
 
-// Footer
 footer {
   display: flex;
   flex-direction: column;
@@ -1221,7 +1200,6 @@ footer {
   }
 }
 
-// Form styles
 .newsletter-form {
   display: flex;
   justify-content: center;
@@ -1301,7 +1279,6 @@ footer {
   }
 }
 
-// Contact form styles
 .form-vid-wrapper {
   display: flex;
   justify-content: center;
@@ -1435,7 +1412,6 @@ footer {
   }
 }
 
-// Buttons
 .show-articles,
 .read-more {
   margin: auto;
@@ -1512,7 +1488,6 @@ footer {
   }
 }
 
-// Media queries
 @media (min-width: 1800px) {
   nav a {
     font-size: 20px;
@@ -1563,7 +1538,6 @@ footer {
   }
 }
 
-// Improved mobile menu spacing for screens below 600px
 @media (max-width: 600px) {
   .mobile-menu {
     display: flex;
@@ -1574,7 +1548,7 @@ footer {
   .hamburger {
     position: unset;
     transform: translateY(-5%);
-    padding: 10px; // Added padding for better touch area
+    padding: 10px;
   }
 
   a:has(.logo-img) {
@@ -1584,7 +1558,6 @@ footer {
   }
 }
 
-// Further improved spacing for very small screens
 @media (max-width: 375px) {
   a:has(.logo-img) {
     width: unset;
@@ -1592,7 +1565,7 @@ footer {
 
   .logo-img {
     margin-left: 0;
-    width: 220px; // Slightly smaller logo for very small screens
+    width: 220px;
   }
 
   .hamburger {
@@ -1600,7 +1573,6 @@ footer {
   }
 }
 
-// Textarea styles
 .textarea {
   margin: auto 50px;
   display: flex;
@@ -1646,7 +1618,6 @@ footer {
   }
 }
 
-// Property info
 .property-info {
   margin-right: 50px;
   display: flex;
@@ -1654,7 +1625,7 @@ footer {
   gap: 2rem;
   position: sticky;
   top: 8rem;
-  height: fit-content; // Prevent stretching
+  height: fit-content;
   overflow-y: hidden;
 
   & > div > p {
@@ -1665,8 +1636,8 @@ footer {
   }
 
   @media (max-width: 985px) {
-    position: static; // Remove sticky on mobile
-    margin-left: 25px;
+    position: static;
+    margin-left: 35px;
     margin-right: 25px;
     top: auto;
     max-height: none;
@@ -1783,7 +1754,6 @@ footer {
   }
 }
 
-// Articles and press
 .press-post {
   &.press-post-hidden {
     display: none !important;
@@ -1893,7 +1863,6 @@ footer {
   }
 }
 
-// Glide styles - Updated for Additional Projects
 .glide-posts-container {
   margin-top: 80px;
   border-top: 1px solid $color-border;
@@ -1917,7 +1886,7 @@ footer {
 
   .glide__track {
     overflow: hidden;
-    padding: 0 70px; // Space for arrows
+    padding: 0 70px;
   }
 
   .glide__slides {
@@ -2015,7 +1984,7 @@ footer {
 
   .glide__arrow {
     background: $color-white;
-    height: 60px; // Fixed height instead of 100%
+    height: 60px;
     width: 69px;
     @media (max-width: 400px) {
       width: 39px;
