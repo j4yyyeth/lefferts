@@ -4,11 +4,13 @@ export interface Props {
     image: string;
     title: string;
     link: string;
+    target?: string;
   };
   property2: {
     image: string;
     title: string;
     link?: string;
+    target?: string;
   };
 }
 
@@ -18,19 +20,21 @@ const { property1, property2 } = Astro.props;
 <div class="property-imgs">
   <div class="property-home">
     <img src={property1.image} alt={property1.title} />
-    <a href={property1.link}>
+    <a href={property1.link} target={property1.target}>
       <p>{property1.title}</p>
     </a>
   </div>
   <div class="property-divider"></div>
   <div class="property-home">
     <img src={property2.image} alt={property2.title} />
-    {property2.link ? (
-      <a href={property2.link}>
+    {
+      property2.link ? (
+        <a href={property2.link} target={property2.target}>
+          <p>{property2.title}</p>
+        </a>
+      ) : (
         <p>{property2.title}</p>
-      </a>
-    ) : (
-      <p>{property2.title}</p>
-    )}
+      )
+    }
   </div>
 </div>
