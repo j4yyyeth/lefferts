@@ -10,10 +10,10 @@ const { isHome = false } = Astro.props;
   <nav class={`${!isHome ? 'white-bg' : 'home-menu'} main-menu`}>
     <div class="menu-main-container">
       <ul id="menu-main">
-        <li><a href="/">About</a></li>
-        <li><a href="/portfolio">Portfolio</a></li>
-        <li><a href="/press">Press</a></li>
-        <li><a href="/contact">Contact</a></li>
+        <a href="/">About</a>
+        <a href="/portfolio">Portfolio</a>
+        <a href="/press">Press</a>
+        <a href="/contact">Contact</a>
       </ul>
     </div>
     <a href="/"
