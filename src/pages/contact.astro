@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import ContactForm from '../components/ContactForm.astro';
 ---
 
-<Layout title="Contact - Lefferts" description="Get in touch with our team">
+<Layout title="Contact | Lefferts" description="Connect with Lefferts.">
   <div class="hero-section contact">
     <div class="hero-vid">
       <video
@@ -48,64 +48,55 @@ import ContactForm from '../components/ContactForm.astro';
 </Layout>
 
 <script>
-// Contact page initialization with Safari image fallback
-function initializeContactVideos() {
-  const heroVideo = document.querySelector('[data-contact-hero-video]');
-  const formVideo = document.querySelector('[data-form-video]');
-  const heroContent = document.querySelector('.hero-content');
+  function initializeContactVideos() {
+    const heroVideo = document.querySelector('[data-contact-hero-video]');
+    const formVideo = document.querySelector('[data-form-video]');
+    const heroContent = document.querySelector('.hero-content');
 
-  // Detect Safari
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-  console.log('Safari detected:', isSafari);
+    console.log('Safari detected:', isSafari);
 
-  if (isSafari) {
-    // Use image fallbacks for Safari
-    initializeSafariImageFallback(
-      heroVideo,
-      '/images/contact-header.webp',
-      () => {
-        // Show hero content after image is ready
-        if (heroContent) {
-          heroContent.style.opacity = '1';
+    if (isSafari) {
+      initializeSafariImageFallback(
+        heroVideo,
+        '/images/contact-header.webp',
+        () => {
+          if (heroContent) {
+            heroContent.style.opacity = '1';
+          }
         }
-      }
-    );
+      );
 
-    initializeSafariImageFallback(formVideo, '/images/contact-header.webp');
-  } else {
-    // Use videos for non-Safari browsers
-    if (heroVideo) {
-      initializeVideo(heroVideo, () => {
-        // Show hero content after video is ready
-        if (heroContent) {
-          heroContent.style.opacity = '1';
-        }
-      });
+      initializeSafariImageFallback(formVideo, '/images/contact-header.webp');
     } else {
-      // No hero video, just show content
-      if (heroContent) {
-        heroContent.style.opacity = '1';
+      if (heroVideo) {
+        initializeVideo(heroVideo, () => {
+          if (heroContent) {
+            heroContent.style.opacity = '1';
+          }
+        });
+      } else {
+        if (heroContent) {
+          heroContent.style.opacity = '1';
+        }
       }
-    }
 
-    // Initialize form video
-    if (formVideo) {
-      initializeVideo(formVideo);
+      if (formVideo) {
+        initializeVideo(formVideo);
+      }
     }
   }
-}
 
-function initializeSafariImageFallback(videoElement, imageSrc, onReady) {
-  if (!videoElement) return;
+  function initializeSafariImageFallback(videoElement, imageSrc, onReady) {
+    if (!videoElement) return;
 
-  console.log('Replacing video with image for Safari:', imageSrc);
+    console.log('Replacing video with image for Safari:', imageSrc);
 
-  // Create image element
-  const img = document.createElement('img');
-  img.src = imageSrc;
-  img.alt = 'Contact background';
-  img.style.cssText = `
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.alt = 'Contact background';
+    img.style.cssText = `
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -113,151 +104,137 @@ function initializeSafariImageFallback(videoElement, imageSrc, onReady) {
     transition: opacity 0.5s ease;
   `;
 
-  // Copy any classes from video to image
-  img.className = videoElement.className;
+    img.className = videoElement.className;
 
-  // Function to show image
-  const showImage = () => {
-    img.style.opacity = '1';
-    if (onReady) {
-      setTimeout(onReady, 100);
-    }
-  };
-
-  // Handle image load
-  img.addEventListener('load', () => {
-    console.log('Safari fallback image loaded successfully');
-    showImage();
-  });
-
-  // Handle image error
-  img.addEventListener('error', () => {
-    console.error('Safari fallback image failed to load:', imageSrc);
-    // Still show the element and trigger callback
-    showImage();
-  });
-
-  // Replace video with image
-  const parent = videoElement.parentNode;
-  if (parent) {
-    parent.replaceChild(img, videoElement);
-  }
-
-  // If image is already cached and loaded
-  if (img.complete) {
-    showImage();
-  }
-}
-
-function initializeVideo(video, onReady) {
-  if (!video) return;
-
-  // Ensure all required attributes are set
-  video.muted = true;
-  video.playsInline = true;
-  video.autoplay = true;
-  video.loop = true;
-
-  // Safari-specific attributes
-  video.setAttribute('webkit-playsinline', 'true');
-  video.setAttribute('playsinline', 'true');
-
-  let videoStarted = false;
-
-  // Function to show video smoothly
-  const showVideo = () => {
-    if (!videoStarted) {
-      video.style.opacity = '1';
-      videoStarted = true;
-
-      // Call onReady callback if provided
+    const showImage = () => {
+      img.style.opacity = '1';
       if (onReady) {
         setTimeout(onReady, 100);
       }
+    };
+
+    img.addEventListener('load', () => {
+      console.log('Safari fallback image loaded successfully');
+      showImage();
+    });
+
+    img.addEventListener('error', () => {
+      console.error('Safari fallback image failed to load:', imageSrc);
+      showImage();
+    });
+
+    const parent = videoElement.parentNode;
+    if (parent) {
+      parent.replaceChild(img, videoElement);
     }
-  };
-
-  // Force video to start
-  const startVideo = () => {
-    video.currentTime = 0;
-    const playPromise = video.play();
-
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          console.log('Contact video started successfully');
-          showVideo();
-        })
-        .catch((error) => {
-          console.log('Contact video autoplay prevented:', error);
-          // Show video even if autoplay fails
-          showVideo();
-
-          // Try again on user interaction
-          const playOnTouch = () => {
-            video
-              .play()
-              .then(() => {
-                console.log('Contact video started on interaction');
-                showVideo();
-              })
-              .catch((e) =>
-                console.log('Contact video interaction play failed:', e)
-              );
-          };
-
-          document.addEventListener('click', playOnTouch, { once: true });
-          document.addEventListener('touchstart', playOnTouch, {
-            once: true,
-          });
-        });
+    if (img.complete) {
+      showImage();
     }
-  };
-
-  // Start video when it's ready
-  if (video.readyState >= 2) {
-    startVideo();
-  } else {
-    video.addEventListener('loadeddata', startVideo, { once: true });
-    video.addEventListener(
-      'canplaythrough',
-      () => {
-        if (!videoStarted) startVideo();
-      },
-      { once: true }
-    );
-
-    // Fallback timeout to show video
-    setTimeout(() => {
-      if (!videoStarted) {
-        console.log('Contact video loading timeout, showing anyway');
-        showVideo();
-      }
-    }, 2000);
   }
 
-  // Handle video errors
-  video.addEventListener('error', (e) => {
-    console.error('Contact video error:', e);
-    showVideo(); // Show video element even on error
+  function initializeVideo(video, onReady) {
+    if (!video) return;
+
+    video.muted = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.loop = true;
+
+    video.setAttribute('webkit-playsinline', 'true');
+    video.setAttribute('playsinline', 'true');
+
+    let videoStarted = false;
+
+    const showVideo = () => {
+      if (!videoStarted) {
+        video.style.opacity = '1';
+        videoStarted = true;
+
+        if (onReady) {
+          setTimeout(onReady, 100);
+        }
+      }
+    };
+
+    const startVideo = () => {
+      video.currentTime = 0;
+      const playPromise = video.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Contact video started successfully');
+            showVideo();
+          })
+          .catch((error) => {
+            console.log('Contact video autoplay prevented:', error);
+            showVideo();
+
+            // Try again on user interaction
+            const playOnTouch = () => {
+              video
+                .play()
+                .then(() => {
+                  console.log('Contact video started on interaction');
+                  showVideo();
+                })
+                .catch((e) =>
+                  console.log('Contact video interaction play failed:', e)
+                );
+            };
+
+            document.addEventListener('click', playOnTouch, { once: true });
+            document.addEventListener('touchstart', playOnTouch, {
+              once: true,
+            });
+          });
+      }
+    };
+
+    // Start video when it's ready
+    if (video.readyState >= 2) {
+      startVideo();
+    } else {
+      video.addEventListener('loadeddata', startVideo, { once: true });
+      video.addEventListener(
+        'canplaythrough',
+        () => {
+          if (!videoStarted) startVideo();
+        },
+        { once: true }
+      );
+
+      // Fallback timeout to show video
+      setTimeout(() => {
+        if (!videoStarted) {
+          console.log('Contact video loading timeout, showing anyway');
+          showVideo();
+        }
+      }, 2000);
+    }
+
+    // Handle video errors
+    video.addEventListener('error', (e) => {
+      console.error('Contact video error:', e);
+      showVideo(); // Show video element even on error
+    });
+
+    // Ensure proper looping
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      video.play().catch((e) => console.log('Contact video loop failed:', e));
+    });
+  }
+
+  // Initialize immediately if DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeContactVideos);
+  } else {
+    initializeContactVideos();
+  }
+
+  // Re-initialize after view transitions
+  document.addEventListener('astro:after-swap', () => {
+    setTimeout(initializeContactVideos, 50);
   });
-
-  // Ensure proper looping
-  video.addEventListener('ended', () => {
-    video.currentTime = 0;
-    video.play().catch((e) => console.log('Contact video loop failed:', e));
-  });
-}
-
-// Initialize immediately if DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeContactVideos);
-} else {
-  initializeContactVideos();
-}
-
-// Re-initialize after view transitions
-document.addEventListener('astro:after-swap', () => {
-  setTimeout(initializeContactVideos, 50);
-});
 </script>
