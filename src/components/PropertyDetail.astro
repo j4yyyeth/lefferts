@@ -146,16 +146,23 @@ const websiteDisplay = property.website
         }
         {
           property.gallery &&
-            property.gallery.map((image, index) => (
-              <img
-                src={image}
-                alt={`${property.title} gallery image ${index + 1}`}
-                class="gallery-item"
-                data-index={index + 1}
-                width="689"
-                height="400"
-              />
-            ))
+            property.gallery.map((image, index) => {
+              // Calculate the correct data-index based on whether there's a featured video or image
+              const dataIndex =
+                property.featuredVideo || property.featuredImage
+                  ? index + 1
+                  : index;
+              return (
+                <img
+                  src={image}
+                  alt={`${property.title} gallery image ${index + 1}`}
+                  class="gallery-item"
+                  data-index={dataIndex}
+                  width="689"
+                  height="400"
+                />
+              );
+            })
         }
       </div>
 
@@ -333,6 +340,11 @@ const websiteDisplay = property.website
   </div>
   <span class="close">&times;</span>
 </div>
+
+<script define:vars={{ featuredImage: property.featuredImage }}>
+  window.propertyFeaturedImage = featuredImage;
+</script>
+
 <script>
   function handleImagesSidebarLayout() {
     const imagesSidebars = document.querySelectorAll('.images-sidebar');
@@ -347,5 +359,476 @@ const websiteDisplay = property.website
       }
     });
   }
-  document.addEventListener('DOMContentLoaded', handleImagesSidebarLayout);
+
+  function initializePropertyDetailVideos() {
+    // Detect Safari
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // Set global flags for main.js to check
+    window.isSafariBrowser = isSafari;
+    window.safariVideoFixApplied = isSafari;
+
+    console.log('PropertyDetail: Safari detected:', isSafari);
+
+    if (isSafari) {
+      // Replace videos with featured image for Safari
+      replaceSafariVideosWithImage();
+      // Initialize gallery modal for Safari
+      setTimeout(() => {
+        initSafariGalleryModal();
+      }, 100);
+    } else {
+      // Initialize videos normally for other browsers
+      initializePropertyVideos();
+    }
+  }
+
+  function replaceSafariVideosWithImage() {
+    console.log('Safari: Starting video replacement');
+
+    let featuredImageSrc = null;
+
+    // Try to get from window.propertyFeaturedImage (passed from Astro)
+    if (window.propertyFeaturedImage) {
+      featuredImageSrc = window.propertyFeaturedImage;
+      console.log('Safari: Using Astro featured image:', featuredImageSrc);
+    }
+
+    // Fallback: Look for existing images in DOM
+    if (!featuredImageSrc) {
+      const existingImg = document.querySelector(
+        '.images-sidebar img, .gallery-item img'
+      );
+      if (existingImg) {
+        featuredImageSrc = existingImg.src;
+        console.log('Safari: Using DOM image:', featuredImageSrc);
+      }
+    }
+
+    if (!featuredImageSrc) {
+      console.log('Safari: No image found, hiding videos');
+      hideAllVideos();
+      return;
+    }
+
+    // Replace videos with the featured image
+    replaceVideosWithImage(featuredImageSrc);
+  }
+
+  function hideAllVideos() {
+    const allVideos = document.querySelectorAll('video');
+    allVideos.forEach((video) => {
+      video.style.display = 'none';
+      // Also hide the parent container if it only contains the video
+      const parent = video.parentElement;
+      if (parent && parent.children.length === 1) {
+        parent.style.display = 'none';
+      }
+    });
+  }
+
+  function replaceVideosWithImage(imageSrc) {
+    console.log('Safari: Replacing videos with image:', imageSrc);
+
+    // Replace desktop sidebar video (inside .gallery-item div)
+    const sidebarVideoContainers = document.querySelectorAll(
+      '.images-sidebar .gallery-item'
+    );
+    sidebarVideoContainers.forEach((container, index) => {
+      const video = container.querySelector('video');
+      if (video) {
+        console.log(`Safari: Replacing sidebar video ${index}`);
+
+        // Create replacement image
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        img.alt = 'Property featured image';
+        img.className = 'property-featured-img gallery-item';
+
+        // Copy data-index from container or video
+        const dataIndex = container.getAttribute('data-index') || '0';
+        img.setAttribute('data-index', dataIndex);
+
+        // Copy width
+        if (video.getAttribute('width')) {
+          img.setAttribute('width', video.getAttribute('width'));
+        }
+
+        // Apply styling
+        img.style.cssText = `
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+      `;
+
+        // Replace video with image
+        container.innerHTML = '';
+        container.appendChild(img);
+
+        // Ensure container keeps gallery-item class
+        if (!container.classList.contains('gallery-item')) {
+          container.classList.add('gallery-item');
+        }
+      }
+    });
+
+    // Handle mobile gallery videos (in glide slides) - IMPROVED
+    const mobileGallery = document.querySelector('.glide-gallery');
+    if (mobileGallery) {
+      const gallerySlides = mobileGallery.querySelectorAll('.glide__slide');
+      const slidesContainer = mobileGallery.querySelector('.glide__slides');
+
+      gallerySlides.forEach((slide, index) => {
+        const video = slide.querySelector('video');
+        if (video) {
+          console.log(
+            `Safari: Replacing mobile gallery video ${index} with featured image`
+          );
+
+          // Instead of removing the slide, replace the video with the featured image
+          const img = document.createElement('img');
+          img.src = imageSrc;
+          img.alt = 'Featured Image';
+          img.className = 'gallery-image';
+          img.setAttribute('width', '689');
+          img.setAttribute('height', '400');
+          img.style.cssText = `
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        `;
+
+          // Replace video with image in the same slide
+          slide.innerHTML = '';
+          slide.appendChild(img);
+
+          console.log(
+            'Safari: Successfully replaced mobile gallery video with featured image'
+          );
+        }
+      });
+
+      // Check remaining slides
+      const remainingSlides = mobileGallery.querySelectorAll('.glide__slide');
+      console.log(
+        `Safari: Mobile gallery now has ${remainingSlides.length} slides`
+      );
+
+      if (remainingSlides.length === 0) {
+        console.log('Safari: No slides left in mobile gallery, hiding it');
+        mobileGallery.style.display = 'none';
+      }
+    }
+
+    // Replace modal videos (in modal slides)
+    const modalSlides = document.querySelectorAll('.glide-modal .glide__slide');
+    const modalSlidesToRemove = [];
+
+    modalSlides.forEach((slide, index) => {
+      const video = slide.querySelector('video');
+      if (video) {
+        console.log(`Safari: Marking modal slide video ${index} for removal`);
+        modalSlidesToRemove.push(slide);
+      }
+    });
+
+    // Remove video slides
+    modalSlidesToRemove.forEach((slide) => slide.remove());
+
+    // Check if modal has any slides left, if not hide modal functionality
+    const modalGallery = document.querySelector('.glide-modal');
+    if (modalGallery) {
+      const remainingModalSlides =
+        modalGallery.querySelectorAll('.glide__slide');
+      if (remainingModalSlides.length === 0) {
+        console.log('Safari: No slides left in modal, hiding modal');
+        const modal = document.getElementById('galleryModal');
+        if (modal) {
+          modal.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  function initSafariGalleryModal() {
+    console.log('Safari: Initializing gallery modal');
+
+    const modal = document.getElementById('galleryModal');
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    const closeBtn = document.querySelector('.close');
+
+    if (!modal || !galleryItems.length) {
+      console.log('Safari: No modal or gallery items found');
+      return;
+    }
+
+    console.log(`Safari: Found ${galleryItems.length} gallery items`);
+
+    // Rebuild modal slides for Safari (only images, no videos)
+    const modalSlidesContainer = modal.querySelector('.glide__slides');
+    if (modalSlidesContainer) {
+      modalSlidesContainer.innerHTML = '';
+
+      // Create a set to track unique image sources to prevent duplicates
+      const uniqueImages = new Set();
+      const validSlides = [];
+
+      galleryItems.forEach((item, index) => {
+        let img = null;
+        let imageSrc = null;
+
+        if (item.tagName === 'IMG') {
+          img = item;
+          imageSrc = item.src;
+        } else if (item.tagName === 'DIV') {
+          img = item.querySelector('img');
+          imageSrc = img ? img.src : null;
+        }
+
+        // Only add if we have an image and it's not a duplicate
+        if (img && imageSrc && !uniqueImages.has(imageSrc)) {
+          uniqueImages.add(imageSrc);
+
+          const slide = document.createElement('li');
+          slide.className = 'glide__slide';
+
+          const modalImg = document.createElement('img');
+          modalImg.className = 'modal-media';
+          modalImg.src = imageSrc;
+          modalImg.alt = img.alt || `Gallery image ${validSlides.length + 1}`;
+          modalImg.style.maxWidth = '90vw';
+          modalImg.style.maxHeight = '90vh';
+          modalImg.style.objectFit = 'contain';
+          modalImg.style.display = 'block';
+
+          slide.appendChild(modalImg);
+          modalSlidesContainer.appendChild(slide);
+          validSlides.push({ element: item, slideIndex: validSlides.length });
+
+          console.log(`Safari: Added unique slide for ${img.alt || 'image'}`);
+        } else if (imageSrc && uniqueImages.has(imageSrc)) {
+          console.log(`Safari: Skipped duplicate image: ${imageSrc}`);
+        }
+      });
+
+      console.log(`Safari: Created ${validSlides.length} unique modal slides`);
+    }
+
+    // Add click handlers to gallery items with correct slide mapping
+    galleryItems.forEach((item, index) => {
+      // Clone element to remove existing listeners
+      const newItem = item.cloneNode(true);
+      const parent = item.parentNode;
+      parent.replaceChild(newItem, item);
+
+      newItem.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Find the corresponding slide index for this image
+        let imageSrc = null;
+        if (newItem.tagName === 'IMG') {
+          imageSrc = newItem.src;
+        } else if (newItem.tagName === 'DIV') {
+          const img = newItem.querySelector('img');
+          imageSrc = img ? img.src : null;
+        }
+
+        // Find the slide index that matches this image source
+        let slideIndex = 0;
+        if (imageSrc) {
+          const modalSlides = modal.querySelectorAll('.glide__slide img');
+          modalSlides.forEach((modalImg, idx) => {
+            if (modalImg.src === imageSrc) {
+              slideIndex = idx;
+            }
+          });
+        }
+
+        console.log(
+          `Safari: Gallery item clicked, opening modal at slide ${slideIndex}`
+        );
+
+        // Show modal
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+
+        // Initialize Glide slider
+        setTimeout(() => {
+          initSafariModalSlider(slideIndex);
+        }, 50);
+      });
+    });
+
+    // Close modal handlers
+    function closeModal() {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+
+      if (window.safariModalGlide) {
+        try {
+          window.safariModalGlide.destroy();
+        } catch (e) {}
+        window.safariModalGlide = null;
+      }
+    }
+
+    if (closeBtn) {
+      closeBtn.onclick = closeModal;
+    }
+
+    modal.onclick = function (event) {
+      if (event.target === modal) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && modal.style.display === 'block') {
+        closeModal();
+      }
+    });
+
+    console.log('Safari: Gallery modal initialized');
+  }
+
+  function initSafariModalSlider(startIndex = 0) {
+    console.log(`Safari: Initializing modal slider at index ${startIndex}`);
+
+    if (typeof Glide === 'undefined') {
+      console.log('Safari: Glide not available');
+      return;
+    }
+
+    const modalSlider = document.querySelector('.glide-modal');
+    if (!modalSlider) {
+      console.log('Safari: Modal slider not found');
+      return;
+    }
+
+    const slides = modalSlider.querySelectorAll('.glide__slide');
+    const validIndex = Math.max(0, Math.min(startIndex, slides.length - 1));
+
+    // Destroy existing instance
+    if (window.safariModalGlide) {
+      try {
+        window.safariModalGlide.destroy();
+      } catch (e) {}
+      window.safariModalGlide = null;
+    }
+
+    try {
+      window.safariModalGlide = new Glide('.glide-modal', {
+        type: 'carousel',
+        startAt: validIndex,
+        perView: 1,
+        gap: 0,
+        autoplay: false,
+        keyboard: true,
+        rewind: true,
+        animationDuration: 300,
+      }).mount();
+
+      console.log(`Safari: Modal slider initialized at index ${validIndex}`);
+    } catch (error) {
+      console.error('Safari: Modal slider error:', error);
+    }
+  }
+
+  function initializePropertyVideos() {
+    console.log('Initializing property videos for non-Safari browser');
+
+    const videos = document.querySelectorAll('video');
+
+    videos.forEach((video, index) => {
+      console.log(`Initializing video ${index}:`, video.className);
+
+      // Skip modal videos as they should be controlled by user
+      if (video.classList.contains('modal-media')) {
+        console.log(`Skipping modal video ${index}`);
+        return;
+      }
+
+      // Set video properties
+      video.muted = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.loop = true;
+
+      // Safari-specific attributes
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('playsinline', 'true');
+
+      // Try to play the video
+      const playVideo = () => {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              console.log(`Property video ${index} started successfully`);
+            })
+            .catch((error) => {
+              console.log(`Property video ${index} autoplay prevented:`, error);
+
+              const playOnInteraction = () => {
+                video
+                  .play()
+                  .then(() =>
+                    console.log(
+                      `Property video ${index} started on interaction`
+                    )
+                  )
+                  .catch((e) =>
+                    console.log(
+                      `Property video ${index} interaction play failed:`,
+                      e
+                    )
+                  );
+              };
+
+              document.addEventListener('click', playOnInteraction, {
+                once: true,
+              });
+              document.addEventListener('touchstart', playOnInteraction, {
+                once: true,
+              });
+            });
+        }
+      };
+
+      if (video.readyState >= 2) {
+        playVideo();
+      } else {
+        video.addEventListener('loadeddata', playVideo, { once: true });
+      }
+
+      video.addEventListener('error', (e) => {
+        console.error(`Property video ${index} error:`, e);
+      });
+
+      video.addEventListener('ended', () => {
+        video.currentTime = 0;
+        video
+          .play()
+          .catch((e) => console.log(`Property video ${index} loop failed:`, e));
+      });
+    });
+  }
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('PropertyDetail: DOM Content Loaded');
+    handleImagesSidebarLayout();
+    initializePropertyDetailVideos();
+  });
+
+  // Re-initialize after view transitions
+  document.addEventListener('astro:after-swap', () => {
+    console.log('PropertyDetail: After view transition');
+    setTimeout(() => {
+      handleImagesSidebarLayout();
+      initializePropertyDetailVideos();
+    }, 50);
+  });
 </script>

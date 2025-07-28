@@ -375,8 +375,16 @@ function applySafariFixes() {
 }
 
 // Gallery modal functionality - FIXED VERSION with better debugging
+// Gallery modal functionality - FIXED VERSION with Safari check
 function initGalleryModal() {
     console.log('=== Starting initGalleryModal ===');
+    
+    // Skip if Safari browser (PropertyDetail handles Safari separately)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (isSafari) {
+        console.log('Safari detected: Skipping main.js gallery modal initialization');
+        return;
+    }
     
     const modal = document.getElementById('galleryModal');
     const galleryItems = document.querySelectorAll('.gallery-item');
@@ -460,6 +468,18 @@ function initGalleryModal() {
                 });
                 
                 slide.appendChild(modalVideo);
+            } else if (item.tagName === 'DIV' && item.querySelector('img')) {
+                // Handle DIVs that contain images (Safari replacement case)
+                const img = item.querySelector('img');
+                const modalImg = document.createElement('img');
+                modalImg.className = 'modal-media';
+                modalImg.src = img.src;
+                modalImg.alt = img.alt || `Gallery image ${index + 1}`;
+                modalImg.style.maxWidth = '90vw';
+                modalImg.style.maxHeight = '90vh';
+                modalImg.style.objectFit = 'contain';
+                modalImg.style.display = 'block';
+                slide.appendChild(modalImg);
             }
             
             modalSlidesContainer.appendChild(slide);
@@ -1096,7 +1116,6 @@ function animateHero() {
     }
 }
 
-// Heading Text Animation with ScrollTrigger single-fire protection
 function animateHeadingText() {
     const headingText = document.querySelector('.heading-txt h2');
     
@@ -1135,7 +1154,6 @@ function animateHeadingText() {
     scrollTriggersCreated.add(triggerKey);
 }
 
-// Stats Animation with single-fire protection
 function animateStats() {
     const statsContainer = document.querySelector('.stats');
     const statItems = document.querySelectorAll('.statistic');
@@ -1148,47 +1166,16 @@ function animateStats() {
         return;
     }
 
-    // Check if already animated
     if (statsContainer.dataset.animated === 'true') {
         console.log('Stats already animated, skipping');
         return;
     }
 
-    // Set initial states
-    statItems.forEach((stat) => {
-        gsap.set(stat, {
-            opacity: 0,
-            y: 60,
-            scale: 0.8,
-        });
-    });
-
-    // Create staggered animation
-    gsap.to(statItems, {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: 'power2.out',
-        scrollTrigger: {
-            trigger: statsContainer,
-            start: 'top 75%',
-            end: 'bottom 25%',
-            toggleActions: 'play none none none',
-            once: true, // Single fire
-            onToggle: self => {
-                if (self.isActive) {
-                    statsContainer.dataset.animated = 'true';
-                }
-            }
-        },
-    });
-
+    statsContainer.dataset.animated = 'true';
+    
     scrollTriggersCreated.add(triggerKey);
 }
 
-// Featured Properties Animation with single-fire protection
 function animateFeaturedProperties() {
     const propertiesContainer = document.querySelector('.property-imgs');
     const propertyItems = document.querySelectorAll('.property-home');
@@ -1202,13 +1189,11 @@ function animateFeaturedProperties() {
         return;
     }
 
-    // Check if already animated
     if (propertiesContainer.dataset.animated === 'true') {
         console.log('Featured properties already animated, skipping');
         return;
     }
 
-    // Set initial states
     propertyItems.forEach((property, index) => {
         const img = property.querySelector('img');
         const text = property.querySelector('p');
@@ -1236,14 +1221,13 @@ function animateFeaturedProperties() {
         });
     }
 
-    // Create timeline for properties
     const propertiesTl = gsap.timeline({
         scrollTrigger: {
             trigger: propertiesContainer,
             start: 'top 70%',
             end: 'bottom 30%',
             toggleActions: 'play none none none',
-            once: true, // Single fire
+            once: true,
             onToggle: self => {
                 if (self.isActive) {
                     propertiesContainer.dataset.animated = 'true';
@@ -1255,7 +1239,6 @@ function animateFeaturedProperties() {
         }
     });
 
-    // Animate first property
     const firstProperty = propertyItems[0];
     if (firstProperty) {
         const firstImg = firstProperty.querySelector('img');
@@ -1281,7 +1264,6 @@ function animateFeaturedProperties() {
         }
     }
 
-    // Animate divider
     if (propertyDivider) {
         propertiesTl.to(propertyDivider, {
             opacity: 1,
@@ -1291,7 +1273,6 @@ function animateFeaturedProperties() {
         }, '-=0.4');
     }
 
-    // Animate second property
     const secondProperty = propertyItems[1];
     if (secondProperty) {
         const secondImg = secondProperty.querySelector('img');
@@ -1417,7 +1398,6 @@ function animateTextboxes() {
 
 // Reset animations function (for page transitions)
 function resetAnimationsForNewPage() {
-    console.log('Resetting animations for new page');
     
     // Reset global flag
     animationsInitialized = false;
