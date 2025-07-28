@@ -798,6 +798,14 @@ header {
     p {
       width: unset;
     }
+
+    &.properties {
+      margin: auto 30px;
+    }
+  }
+
+  .container {
+    margin-left: 0;
   }
 }
 
@@ -980,6 +988,10 @@ header {
     top: 50%;
     left: 50%;
     opacity: 1;
+  }
+
+  &.building {
+    position: relative;
   }
 }
 
@@ -1658,11 +1670,13 @@ footer {
     background: $color-white;
     padding-bottom: 1rem;
     z-index: 5;
+    margin-top: 30px;
 
     @media (max-width: 985px) {
       position: static;
       background: transparent;
       padding-bottom: 0;
+      margin-top: 0;
     }
   }
 
@@ -1895,13 +1909,37 @@ footer {
     margin: 0;
     padding: 0;
     list-style: none;
+    align-items: stretch;
   }
 
   .glide__slide {
     min-width: 0;
     flex: none;
-    margin: 0 5px !important;
     list-style: none;
+    box-sizing: border-box;
+    list-style: none;
+    width: 25%;
+
+    @media (max-width: 1200px) {
+      width: 33.333%;
+    }
+
+    @media (max-width: 768px) {
+      width: 28%;
+    }
+
+    @media (max-width: 480px) {
+      width: 100%;
+      padding: 0 5px;
+    }
+
+    &:first-child {
+      margin-left: 0 !important;
+    }
+
+    &:last-child {
+      margin-right: 0 !important;
+    }
   }
 
   .glide__arrows {
@@ -2098,34 +2136,27 @@ footer {
 
     > *:first-child {
       grid-column: 1 / -1;
-      // Let first image/video size naturally
     }
 
     > *:nth-child(n + 4) {
       grid-column: 1 / -1;
-      // Let additional images/videos size naturally
     }
 
-    // ONLY target the side-by-side images (2nd and 3rd)
     > *:nth-child(2),
     > *:nth-child(3) {
       object-fit: cover;
-      // Calculate height based on the tallest sibling
       height: 0;
-      min-height: 250px; // Fallback minimum
+      min-height: 250px;
 
-      // Use aspect-ratio to maintain consistency
       aspect-ratio: 4/3;
     }
 
-    // Alternative: Make side-by-side images match each other's height
     &:has(*:nth-child(2)):has(*:nth-child(3)) {
       > *:nth-child(2),
       > *:nth-child(3) {
         height: auto;
         min-height: 250px;
 
-        // Use flexbox to make them equal height
         display: flex;
         align-items: stretch;
 
@@ -2144,7 +2175,6 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    // Let all images in flex layout size naturally
   }
 
   &:not(:has(*:nth-child(4))) {
@@ -2160,12 +2190,12 @@ footer {
     object-fit: cover;
     display: block;
     grid-column: 1 / -1;
-    height: 100%; // Only applies to videos in grid cells
+    height: 100%;
   }
 
   img {
     width: 100%;
-    height: auto; // Let images size naturally by default
+    height: auto;
     max-height: none;
     object-fit: cover;
     display: block;
@@ -2177,21 +2207,19 @@ footer {
     }
   }
 
-  // Specific targeting for side-by-side images only
   &.grid-layout > *:nth-child(2) img,
   &.grid-layout > *:nth-child(3) img {
-    height: 100%; // Force height only for side-by-side images
+    height: 100%;
     object-fit: cover;
   }
 
-  // Ensure gallery items work properly
   .gallery-item {
     cursor: pointer;
     transition: transform 0.3s ease;
     will-change: transform;
 
     &:hover {
-      transform: scale(1.02);
+      transform: scale(1.01);
     }
   }
 }
@@ -2362,6 +2390,9 @@ footer {
   text-decoration: none;
   transition: all 0.3s ease;
   height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 10px;
 
   &:hover {
     .building-slider {
@@ -2380,10 +2411,13 @@ footer {
     font-weight: 500 !important;
     color: $color-black;
     text-decoration: none;
-    margin: 15px 0 0 0;
+    margin: 15px 0 0 20px;
     padding: 0;
-    text-align: center;
-    transition: color 0.3s ease;
+    text-align: left;
+    transition: color 0.3s ease-in-out;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -2392,7 +2426,13 @@ footer {
   height: 400px;
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
   transition: transform 0.3s ease;
+  flex-shrink: 0;
+
+  @media (max-width: 1200px) {
+    height: 350px;
+  }
 
   @media (max-width: 768px) {
     height: 300px;
@@ -2829,7 +2869,6 @@ button.show-articles {
     }
   }
 
-  // Print styles
   @media print {
     .textarea * {
       background: white !important;
@@ -2851,12 +2890,10 @@ button.show-articles {
     }
   }
 
-  // Accessibility improvements
   &:focus-within {
     outline: none;
   }
 
-  // Table styles (if needed for forms or data)
   .textarea table {
     width: 100%;
     border-collapse: collapse;
@@ -2910,12 +2947,10 @@ button.show-articles {
     }
   }
 
-  // Contact information styling
   .textarea p:has(span.mark) {
     margin-bottom: 0.5rem;
   }
 
-  // Last updated styling
   .textarea p:has(strong:contains('Last Updated')) {
     margin-top: 2rem;
     padding-top: 1rem;
@@ -2965,5 +3000,26 @@ button.show-articles {
 @media (min-width: 1151px) {
   .mobile-items {
     display: none !important;
+  }
+}
+
+.glide-posts {
+  .glide__slide {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    &:first-child {
+      margin-left: 0 !important;
+    }
+
+    &:last-child {
+      margin-right: 0 !important;
+    }
+  }
+}
+
+.glide-posts-container {
+  @media (max-width: 1000px) {
+    display: none;
   }
 }
