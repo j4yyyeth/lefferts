@@ -51,7 +51,7 @@ $form_type = $input['form_type'] ?? '';
 error_log("Form type: " . $form_type);
 
 // Email settings
-$contact_email = 'jstudyeth@gmail.com';
+$contact_email = 'info@lefferts.com';
 $from_email = 'info@lefferts.dreamhosters.com';
 
 // Function to send email with better error handling
