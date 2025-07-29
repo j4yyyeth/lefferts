@@ -1,9 +1,5 @@
----
-// Contact form component
----
-
 <div class="form-div-wrapper contact-container">
-  <form class="contact-form">
+  <form class="contact-form" method="post" action="#">
     <div class="form-group">
       <label for="firstName">First Name *</label>
       <input type="text" id="firstName" name="firstName" required />
@@ -31,92 +27,130 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  function initializeContactForm() {
     const contactForm = document.querySelector('.contact-form');
-
-    if (contactForm) {
-      contactForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const submitButton = this.querySelector('.contact-submit');
-        const originalText = submitButton.textContent;
-
-        // Show loading state
-        submitButton.textContent = 'SENDING...';
-        submitButton.disabled = true;
-        submitButton.style.opacity = '0.7';
-
-        const formData = new FormData(this);
-        const data = {
-          form_type: 'contact',
-          firstName: formData.get('firstName'),
-          lastName: formData.get('lastName'),
-          email: formData.get('email'),
-          message: formData.get('message') || '',
-        };
-
-        try {
-          const response = await fetch('/form-handler.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          });
-
-          // Check if response is actually JSON
-          const contentType = response.headers.get('content-type');
-          if (!contentType || !contentType.includes('application/json')) {
-            const textResponse = await response.text();
-            throw new Error(
-              'Server returned non-JSON response: ' +
-                textResponse.substring(0, 100)
-            );
-          }
-
-          const result = await response.json();
-
-          if (response.ok && result.success) {
-            // Show success message
-            const container = document.querySelector('.contact-container');
-            container.innerHTML = `
-                        <div class="success-message">
-                            <h3>Message Sent Successfully!</h3>
-                            <p>${result.message}</p>
-                        </div>
-                    `;
-          } else {
-            const errorMessage = result.error || 'Unknown error occurred';
-            alert('Error: ' + errorMessage);
-
-            // Reset button
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
-            submitButton.style.opacity = '1';
-          }
-        } catch (error) {
-          let errorMessage = 'There was an error sending your message. ';
-
-          if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            errorMessage += 'Please check your internet connection.';
-          } else if (error.message.includes('JSON')) {
-            errorMessage += 'Server response format error.';
-          } else if (error.message.includes('non-JSON')) {
-            errorMessage += 'Server configuration issue.';
-          } else {
-            errorMessage += 'Please try again later.';
-          }
-
-          alert(errorMessage);
-
-          // Reset button
-          submitButton.textContent = originalText;
-          submitButton.disabled = false;
-          submitButton.style.opacity = '1';
-        }
-      });
+    
+    if (!contactForm) {
+      console.log('Contact form not found');
+      return;
     }
+
+    console.log('Contact form found, initializing...');
+
+    // Remove any existing event listeners
+    contactForm.removeEventListener('submit', handleFormSubmit);
+    
+    // Add the event listener
+    contactForm.addEventListener('submit', handleFormSubmit);
+  }
+
+  async function handleFormSubmit(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Form submission intercepted');
+
+    const submitButton = this.querySelector('.contact-submit');
+    const originalText = submitButton.textContent;
+
+    // Show loading state
+    submitButton.textContent = 'SENDING...';
+    submitButton.disabled = true;
+    submitButton.style.opacity = '0.7';
+
+    const formData = new FormData(this);
+    const data = {
+      form_type: 'contact',
+      firstName: formData.get('firstName'),
+      lastName: formData.get('lastName'),
+      email: formData.get('email'),
+      message: formData.get('message') || '',
+    };
+
+    console.log('Sending data:', data);
+
+    try {
+      const response = await fetch('/form-handler.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+      // Check if response is actually JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const textResponse = await response.text();
+        console.error('Non-JSON response:', textResponse);
+        throw new Error(
+          'Server returned non-JSON response: ' +
+            textResponse.substring(0, 100)
+        );
+      }
+
+      const result = await response.json();
+      console.log('Response data:', result);
+
+      if (response.ok && result.success) {
+        // Show success message
+        const container = document.querySelector('.contact-container');
+        container.innerHTML = `
+          <div class="success-message">
+            <h3>Message Sent Successfully!</h3>
+            <p>${result.message}</p>
+          </div>
+        `;
+      } else {
+        const errorMessage = result.error || 'Unknown error occurred';
+        alert('Error: ' + errorMessage);
+
+        // Reset button
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+        submitButton.style.opacity = '1';
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      
+      let errorMessage = 'There was an error sending your message. ';
+
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage += 'Please check your internet connection.';
+      } else if (error.message.includes('JSON')) {
+        errorMessage += 'Server response format error.';
+      } else if (error.message.includes('non-JSON')) {
+        errorMessage += 'Server configuration issue.';
+      } else {
+        errorMessage += 'Please try again later.';
+      }
+
+      alert(errorMessage);
+
+      // Reset button
+      submitButton.textContent = originalText;
+      submitButton.disabled = false;
+      submitButton.style.opacity = '1';
+    }
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeContactForm);
+  } else {
+    initializeContactForm();
+  }
+
+  // Re-initialize after view transitions (for Astro)
+  document.addEventListener('astro:after-swap', () => {
+    setTimeout(initializeContactForm, 50);
   });
+
+  // Also initialize after page load as a fallback
+  window.addEventListener('load', initializeContactForm);
 </script>
 
 <style>
@@ -137,10 +171,16 @@
     text-align: center;
   }
 
+  .success-message h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+  }
+
   .success-message p {
     margin: 0;
     font-weight: 600;
   }
+  
   .contact-container:has(.success-message) .contact-form {
     display: none !important;
   }
