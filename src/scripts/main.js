@@ -1209,8 +1209,6 @@ function reinitializeAfterTransition() {
   initReadMore();
   initHidePress();
   initSmoothScroll();
-  initNewsletterForm();
-  initContactForm();
 
   handleViewTransitionVideos();
   applySafariFixes();
@@ -1246,8 +1244,6 @@ ready(async () => {
     initHidePress();
     initCountUp();
     initSmoothScroll();
-    initNewsletterForm();
-    initContactForm();
     initGlideSliders();
 
     initVideoHandling();
@@ -1289,8 +1285,6 @@ ready(async () => {
     initHidePress();
     initCountUp();
     initSmoothScroll();
-    initNewsletterForm();
-    initContactForm();
     initVideoHandling();
     initHeroVideo();
     initGalleryModal();
