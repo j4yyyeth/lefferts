@@ -3039,16 +3039,26 @@ button.show-articles {
   border-radius: 4px;
   margin-bottom: 20px;
   text-align: center;
+  width: 90%;
+  margin: 0 auto;
 }
 
 .success-message h3 {
   margin: 0 0 10px 0;
   font-size: 18px;
+  letter-spacing: 3px;
+  @media (max-width: 600px) {
+    font-size: 15px;
+  }
 }
 
 .success-message p {
   margin: 0;
   font-weight: 600;
+  letter-spacing: 2px;
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
 }
 
 .contact-container:has(.success-message) .contact-form {
@@ -3068,20 +3078,31 @@ button.show-articles {
   color: #166534;
   padding: 15px;
   border-radius: 4px;
-  margin-bottom: 20px;
   text-align: center;
 }
 .newsletter-success h3 {
   margin: 0 0 10px 0;
   font-size: 18px;
+  letter-spacing: 3px;
+  @media (max-width: 600px) {
+    font-size: 15px;
+  }
 }
 .newsletter-success p {
   margin: 0;
   font-weight: 600;
+  letter-spacing: 2px;
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
 }
 .newsletter-error {
   color: #ef4444;
   font-size: 14px;
   margin-top: 5px;
   margin-bottom: 10px;
+}
+
+.form-group:has(.cf-turnstile) {
+  display: none !important;
 }
