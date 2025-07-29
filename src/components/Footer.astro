@@ -23,12 +23,14 @@ const { showNewsletter = true } = Astro.props;
 
   {
     showNewsletter && (
-      <div class="middle">
-        <p>Register For Lefferts news Updates</p>
+      <div class="middle newsletter-container">
+        <p class="newsletter-title">Register For Lefferts news Updates</p>
         <form class="newsletter-form">
           <input type="text" placeholder="Name" required />
           <input type="email" placeholder="Email" required />
-          <button type="submit">Submit</button>
+          <button class="newsletter-submit" type="submit">
+            Submit
+          </button>
         </form>
       </div>
     )
@@ -48,14 +50,22 @@ const { showNewsletter = true } = Astro.props;
         <p style="font-size: 13px;">Follow Lefferts</p>
         <div class="socials">
           <div class="icons">
-            <a target="_blank" href="https://www.linkedin.com/company/lefferts/" aria-label="LinkedIn">
+            <a
+              target="_blank"
+              href="https://www.linkedin.com/company/lefferts/"
+              aria-label="LinkedIn"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                 <path
                   d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"
                 ></path>
               </svg>
             </a>
-            <a target="_blank" href="https://www.instagram.com/leffertsinvestments/" aria-label="Instagram">
+            <a
+              target="_blank"
+              href="https://www.instagram.com/leffertsinvestments/"
+              aria-label="Instagram"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <g>
                   <path
@@ -83,3 +93,172 @@ const { showNewsletter = true } = Astro.props;
     </div>
   </div>
 </footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const newsletterForm = document.querySelector('.newsletter-form');
+
+    if (newsletterForm) {
+      newsletterForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const submitButton = this.querySelector('.newsletter-submit');
+        const originalText = submitButton.textContent;
+
+        // Show loading state
+        submitButton.textContent = 'SENDING...';
+        submitButton.disabled = true;
+        submitButton.style.opacity = '0.7';
+
+        const formData = new FormData(this);
+        const data = {
+          form_type: 'newsletter',
+          name: formData.get('name'),
+          email: formData.get('email'),
+        };
+
+        // Try multiple possible paths for the PHP handler
+        const possiblePaths = [
+          '/form-handler.php',
+          './form-handler.php',
+          '../form-handler.php',
+          window.location.origin + '/form-handler.php',
+        ];
+
+        let lastError = null;
+        let success = false;
+
+        for (let path of possiblePaths) {
+          try {
+            const response = await fetch(path, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            });
+
+            // If we get a 404, try the next path
+            if (response.status === 404) {
+              continue;
+            }
+
+            // Check if response is actually JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+              const textResponse = await response.text();
+
+              // If it's HTML with 404, continue to next path
+              if (
+                textResponse.includes('404') ||
+                textResponse.includes('Not Found')
+              ) {
+                continue;
+              }
+
+              throw new Error(
+                'Server returned non-JSON response: ' +
+                  textResponse.substring(0, 100)
+              );
+            }
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+              // Show success message
+              const container = document.querySelector('.newsletter-container');
+              container.innerHTML = `
+                            <div class="newsletter-success">
+                                <h3>Successfully Subscribed!</h3>
+                                <p>You'll receive updates about Leffert's latest developments and news.</p>
+                            </div>
+                        `;
+              success = true;
+              break;
+            } else {
+              const errorMessage = result.error || 'Unknown error occurred';
+              throw new Error(errorMessage);
+            }
+          } catch (error) {
+            lastError = error;
+
+            // If this is the last path, we'll handle the error below
+            if (path === possiblePaths[possiblePaths.length - 1]) {
+              break;
+            }
+          }
+        }
+
+        // If we didn't succeed, show error
+        if (!success) {
+          let errorMessage =
+            'There was an error subscribing to the newsletter. ';
+
+          if (lastError && lastError.message.includes('404')) {
+            errorMessage +=
+              'The form handler was not found. Please contact the site administrator.';
+          } else if (
+            lastError &&
+            lastError.message.includes('already subscribed')
+          ) {
+            errorMessage =
+              'This email address is already subscribed to our newsletter.';
+          } else if (
+            lastError &&
+            lastError.name === 'TypeError' &&
+            lastError.message.includes('fetch')
+          ) {
+            errorMessage += 'Please check your internet connection.';
+          } else if (lastError && lastError.message.includes('JSON')) {
+            errorMessage += 'Server response format error.';
+          } else if (lastError && lastError.message.includes('non-JSON')) {
+            errorMessage += 'Server configuration issue.';
+          } else {
+            errorMessage += 'Please try again later.';
+          }
+
+          alert(
+            errorMessage +
+              (lastError ? '\n\nTechnical details: ' + lastError.message : '')
+          );
+
+          // Reset button
+          submitButton.textContent = originalText;
+          submitButton.disabled = false;
+          submitButton.style.opacity = '1';
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  .newsletter-container:has(.newsletter-success) .newsletter-form,
+  .newsletter-container:has(.newsletter-success) .newsletter-title {
+    display: none !important;
+  }
+  .newsletter-container:has(.newsletter-success) {
+    justify-content: center;
+  }
+  .newsletter-success {
+    background-color: #dcfce7;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .newsletter-success p {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .newsletter-error {
+    color: #ef4444;
+    font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+</style>

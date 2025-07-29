@@ -628,23 +628,23 @@ class CountUp {
     this.number = this.el.querySelectorAll('[data-countup-number]');
     this.observerOptions = {
       root: null,
-      rootMargin: '0px 0px',
-      threshold: 0,
+      rootMargin: '0px 0px -10% 0px',
+      threshold: 0.1,
     };
     this.observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.target.dataset.countupAnimated === 'true') {
+        if (entry.target.getAttribute('data-countup-animated') === 'true') {
           return;
         }
 
         const end = parseFloat(
-          entry.target.dataset.countupNumber.replace(/,/g, '')
+          entry.target.getAttribute('data-countup-number').replace(/,/g, '')
         );
         const decimals = this.countDecimals(end);
+
         if (entry.isIntersecting) {
-          entry.target.dataset.countupAnimated = 'true';
+          entry.target.setAttribute('data-countup-animated', 'true');
           this.iterateValue(entry.target, end, decimals);
-          this.observer.unobserve(entry.target);
         }
       });
     }, this.observerOptions);
@@ -653,9 +653,7 @@ class CountUp {
   init() {
     if (this.number.length > 0) {
       this.number.forEach((el) => {
-        if (el.dataset.countupAnimated !== 'true') {
-          this.observer.observe(el);
-        }
+        this.observer.observe(el);
       });
     }
   }
@@ -717,13 +715,22 @@ function initCountUp() {
   });
   countUpInstances = [];
 
-  const dataModules = [...document.querySelectorAll('[data-module="countup"]')];
+  const allCountUpNumbers = document.querySelectorAll('[data-countup-number]');
+  allCountUpNumbers.forEach((el) => {
+    el.removeAttribute('data-countup-animated');
+    const originalNumber = el.getAttribute('data-countup-number');
+    el.textContent = originalNumber;
+  });
+
+  const dataModules = document.querySelectorAll('[data-module="countup"]');
   dataModules.forEach((element) => {
-    if (element.dataset.countupInitialized !== 'true') {
-      const instance = new CountUp(element);
-      countUpInstances.push(instance);
-      element.dataset.countupInitialized = 'true';
-    }
+    element.removeAttribute('data-countup-initialized');
+  });
+
+  dataModules.forEach((element) => {
+    const instance = new CountUp(element);
+    countUpInstances.push(instance);
+    element.setAttribute('data-countup-initialized', 'true');
   });
 }
 
@@ -1201,15 +1208,13 @@ function resetAnimationsForNewPage() {
     el.removeAttribute('data-animated');
   });
 
-  const countupElements = document.querySelectorAll(
-    '[data-countup-animated="true"]'
-  );
+  const countupElements = document.querySelectorAll('[data-countup-animated]');
   countupElements.forEach((el) => {
     el.removeAttribute('data-countup-animated');
   });
 
   const countupModules = document.querySelectorAll(
-    '[data-countup-initialized="true"]'
+    '[data-countup-initialized]'
   );
   countupModules.forEach((el) => {
     el.removeAttribute('data-countup-initialized');
@@ -1237,7 +1242,6 @@ function reinitializeAfterTransition() {
   initHeroScrollEffects();
   initReadMore();
   initHidePress();
-  initCountUp();
   initSmoothScroll();
   initNewsletterForm();
   initContactForm();
@@ -1245,6 +1249,10 @@ function reinitializeAfterTransition() {
   handleViewTransitionVideos();
   applySafariFixes();
   reinitializeAnimations();
+
+  setTimeout(() => {
+    initCountUp();
+  }, 150);
 
   setTimeout(() => {
     const modal = document.getElementById('galleryModal');

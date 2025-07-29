@@ -25,7 +25,7 @@ const {
   description = '',
   isHome = false,
   disableTransitions = false,
-  keywords = '',
+  keywords = 'Lefferts, Real Estate, Development, Investments, Miami Real Estate, Mendy Chudaitov',
   ogImage = '/images/og.png',
   ogType = 'website',
   twitterCard = 'summary_large_image',
@@ -37,7 +37,7 @@ const {
   nofollow = false,
 } = Astro.props;
 
-const siteUrl = Astro.site?.toString() || 'https://lefferts.vercel.app';
+const siteUrl = Astro.site?.toString() || 'https://lefferts.com';
 const fullUrl = canonicalUrl || new URL(Astro.url.pathname, siteUrl).toString();
 const fullOgImage = new URL(ogImage, siteUrl).toString();
 const robotsContent = `${noindex ? 'noindex' : 'index'},${nofollow ? 'nofollow' : 'follow'}`;
@@ -58,10 +58,10 @@ const robotsContent = `${noindex ? 'noindex' : 'index'},${nofollow ? 'nofollow' 
     <meta name="generator" content={Astro.generator} />
 
     <link rel="canonical" href={fullUrl} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/svg+xml" href="/images/icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/icon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#ffffff" />
 
