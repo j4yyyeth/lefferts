@@ -755,40 +755,6 @@ function initSmoothScroll() {
   }
 }
 
-function initNewsletterForm() {
-  const form = document.querySelector('.newsletter-form');
-
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const email = form.querySelector('input[type="email"]').value;
-      alert('Thank you for subscribing!');
-      form.reset();
-    });
-  }
-}
-
-function initContactForm() {
-  const form = document.querySelector('.contact-form');
-
-  if (form) {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-
-      const formData = new FormData(form);
-      const data = {
-        firstName: formData.get('firstName'),
-        lastName: formData.get('lastName'),
-        email: formData.get('email'),
-        message: formData.get('message'),
-      };
-
-      alert('Thank you for your message! We will get back to you soon.');
-      form.reset();
-    });
-  }
-}
-
 function loadGlide() {
   return new Promise((resolve, reject) => {
     if (typeof Glide !== 'undefined') {
