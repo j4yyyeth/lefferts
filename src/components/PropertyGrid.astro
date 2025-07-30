@@ -14,36 +14,76 @@ const { properties } = Astro.props;
 ---
 
 <div class="all-buildings properties">
-  {properties.map((property) => (
-    <a 
-      href={property.link} 
-      class="container building-wrapper"
-      data-astro-prefetch
-    >
-      <div class="content building">
-        <img 
-          class="content-image lazyload" 
-          src={property.image}
-          alt={property.title}
-          loading="lazy"
-          data-astro-transition-persist={`property-image-${property.id}`}
-          style={`--transition-name: property-image-${property.id}`}
-          onload="this.style.opacity = '1'"
-          style="opacity: 0; transition: opacity 0.3s ease;"
-        />
-      </div>
-      <p>{property.title}</p>
-      <p class="no-space">{property.location}</p>
-    </a>
-  ))}
+  {
+    properties.map((property) => (
+      <a
+        href={property.link}
+        class="container building-wrapper"
+        data-astro-prefetch
+      >
+        <div class="content building">
+          <div class="image-container">
+            <div class="skeleton-placeholder" />
+            <img
+              class="content-image lazyload"
+              src={property.image}
+              alt={property.title}
+              loading="lazy"
+              data-astro-transition-persist={`property-image-${property.id}`}
+              style={`--transition-name: property-image-${property.id}`}
+              onload="this.style.opacity = '1'; this.parentElement.querySelector('.skeleton-placeholder').style.display = 'none';"
+              style="opacity: 0; transition: opacity 0.3s ease;"
+            />
+          </div>
+        </div>
+        <p>{property.title}</p>
+        <p class="no-space">{property.location}</p>
+      </a>
+    ))
+  }
 </div>
 
 <style>
+  .image-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .skeleton-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #e2e5e7;
+    background-image: linear-gradient(
+      90deg,
+      #e2e5e7 0px,
+      #f5f5f5 40px,
+      #e2e5e7 80px
+    );
+    background-size: 600px;
+    animation: shimmer 1.6s ease-in-out infinite;
+    border-radius: 4px;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -600px 0;
+    }
+    100% {
+      background-position: 600px 0;
+    }
+  }
+
   /* Ensure smooth transitions across all browsers */
   .content-image {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      opacity 0.3s ease;
   }
-  
+
   /* Safari-specific fixes */
   @supports (-webkit-appearance: none) {
     .content-image {
@@ -53,7 +93,7 @@ const { properties } = Astro.props;
       backface-visibility: hidden;
     }
   }
-  
+
   /* Firefox-specific fixes */
   @-moz-document url-prefix() {
     .content-image {

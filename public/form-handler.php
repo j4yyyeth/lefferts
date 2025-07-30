@@ -52,7 +52,7 @@ error_log("Form type: " . $form_type);
 
 // Email settings
 $contact_email = 'info@lefferts.com';
-$from_email = 'info@lefferts.dreamhosters.com';
+$from_email = 'site-info@lefferts.com';
 
 // Function to send email with better error handling
 function send_email_with_logging($to, $subject, $message, $headers)

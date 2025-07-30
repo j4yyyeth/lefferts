@@ -63,40 +63,55 @@ const websiteDisplay = property.website
             <ul class="glide__slides">
               {property.featuredVideo && (
                 <li class="glide__slide">
-                  <video
-                    class="gallery-video loaded"
-                    playsinline
-                    autoplay
-                    muted
-                    loop
-                    width="689"
-                    height="400"
-                  >
-                    <source src={property.featuredVideo} type="video/mp4" />
-                  </video>
+                  <div class="mobile-video-container">
+                    <div class="skeleton-placeholder" />
+                    <video
+                      class="gallery-video loaded"
+                      playsinline
+                      autoplay
+                      muted
+                      loop
+                      width="689"
+                      height="400"
+                      onloadeddata="this.style.opacity = '1'; this.parentElement.querySelector('.skeleton-placeholder').style.display = 'none';"
+                      style="opacity: 0; transition: opacity 0.3s ease;"
+                    >
+                      <source src={property.featuredVideo} type="video/mp4" />
+                    </video>
+                  </div>
                 </li>
               )}
               {property.featuredImage && !property.featuredVideo && (
                 <li class="glide__slide">
-                  <img
-                    class="gallery-image"
-                    src={property.featuredImage}
-                    alt="Featured Image"
-                    width="689"
-                    height="400"
-                    transition:name={`property-image-${property.id}`}
-                  />
+                  <div class="mobile-image-container">
+                    <div class="skeleton-placeholder" />
+                    <img
+                      class="gallery-image"
+                      src={property.featuredImage}
+                      alt="Featured Image"
+                      width="689"
+                      height="400"
+                      transition:name={`property-image-${property.id}`}
+                      onload="this.style.opacity = '1'; this.parentElement.querySelector('.skeleton-placeholder').style.display = 'none';"
+                      style="opacity: 0; transition: opacity 0.3s ease;"
+                    />
+                  </div>
                 </li>
               )}
               {property.gallery.map((image, index) => (
                 <li class="glide__slide">
-                  <img
-                    class="gallery-image"
-                    src={image}
-                    alt={`${property.title} gallery image ${index + 1}`}
-                    width="689"
-                    height="400"
-                  />
+                  <div class="mobile-image-container">
+                    <div class="skeleton-placeholder" />
+                    <img
+                      class="gallery-image"
+                      src={image}
+                      alt={`${property.title} gallery image ${index + 1}`}
+                      width="689"
+                      height="400"
+                      onload="this.style.opacity = '1'; this.parentElement.querySelector('.skeleton-placeholder').style.display = 'none';"
+                      style="opacity: 0; transition: opacity 0.3s ease;"
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -118,7 +133,8 @@ const websiteDisplay = property.website
       <div class={`images-sidebar ${layoutClass}`}>
         {
           property.featuredVideo && (
-            <div class="gallery-item" data-index="0">
+            <div class="gallery-item video-container" data-index="0">
+              <div class="skeleton-placeholder" />
               <video
                 class="property-featured-img loaded"
                 playsinline
@@ -126,6 +142,8 @@ const websiteDisplay = property.website
                 muted
                 loop
                 width="689"
+                onloadeddata="this.style.opacity = '1'; this.parentElement.querySelector('.skeleton-placeholder').style.display = 'none';"
+                style="opacity: 0; transition: opacity 0.3s ease;"
               >
                 <source src={property.featuredVideo} type="video/mp4" />
               </video>
@@ -134,14 +152,18 @@ const websiteDisplay = property.website
         }
         {
           property.featuredImage && !property.featuredVideo && (
-            <img
-              class="property-featured-img gallery-item"
-              src={property.featuredImage}
-              data-index="0"
-              width="689"
-              alt={`${property.title} featured image`}
-              transition:name={`property-image-${property.id}`}
-            />
+            <div class="gallery-item image-container" data-index="0">
+              <div class="skeleton-placeholder" />
+              <img
+                class="property-featured-img gallery-item-img"
+                src={property.featuredImage}
+                width="689"
+                alt={`${property.title} featured image`}
+                transition:name={`property-image-${property.id}`}
+                onload="this.style.opacity = '1'; this.parentElement.querySelector('.skeleton-placeholder').style.display = 'none';"
+                style="opacity: 0; transition: opacity 0.3s ease;"
+              />
+            </div>
           )
         }
         {
@@ -153,14 +175,21 @@ const websiteDisplay = property.website
                   ? index + 1
                   : index;
               return (
-                <img
-                  src={image}
-                  alt={`${property.title} gallery image ${index + 1}`}
-                  class="gallery-item"
+                <div
+                  class="gallery-item image-container"
                   data-index={dataIndex}
-                  width="689"
-                  height="400"
-                />
+                >
+                  <div class="skeleton-placeholder" />
+                  <img
+                    src={image}
+                    alt={`${property.title} gallery image ${index + 1}`}
+                    class="gallery-item-img"
+                    width="689"
+                    height="400"
+                    onload="this.style.opacity = '1'; this.parentElement.querySelector('.skeleton-placeholder').style.display = 'none';"
+                    style="opacity: 0; transition: opacity 0.3s ease;"
+                  />
+                </div>
               );
             })
         }
@@ -341,6 +370,77 @@ const websiteDisplay = property.website
   <span class="close">&times;</span>
 </div>
 
+<style>
+  .image-container,
+  .mobile-image-container,
+  .video-container,
+  .mobile-video-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .skeleton-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #e2e5e7;
+    background-image: linear-gradient(
+      90deg,
+      #e2e5e7 0px,
+      #f5f5f5 40px,
+      #e2e5e7 80px
+    );
+    background-size: 600px;
+    animation: shimmer 1.6s ease-in-out infinite;
+    border-radius: 4px;
+    z-index: 0;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -600px 0;
+    }
+    100% {
+      background-position: 600px 0;
+    }
+  }
+
+  .gallery-item-img,
+  .gallery-image,
+  .property-featured-img,
+  .gallery-video {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+
+  .building-slider {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .gallery-item {
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+
+  .mobile-image-container,
+  .mobile-video-container {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+</style>
+
 <script define:vars={{ featuredImage: property.featuredImage }}>
   window.propertyFeaturedImage = featuredImage;
 </script>
@@ -350,7 +450,7 @@ const websiteDisplay = property.website
     const imagesSidebars = document.querySelectorAll('.images-sidebar');
 
     imagesSidebars.forEach((sidebar) => {
-      const directImages = sidebar.querySelectorAll(':scope > img');
+      const directImages = sidebar.querySelectorAll(':scope > .gallery-item');
 
       if (directImages.length < 3) {
         sidebar.style.gridTemplateColumns = 'none';
@@ -361,24 +461,19 @@ const websiteDisplay = property.website
   }
 
   function initializePropertyDetailVideos() {
-    // Detect Safari
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-    // Set global flags for main.js to check
     window.isSafariBrowser = isSafari;
     window.safariVideoFixApplied = isSafari;
 
     console.log('PropertyDetail: Safari detected:', isSafari);
 
     if (isSafari) {
-      // Replace videos with featured image for Safari
       replaceSafariVideosWithImage();
-      // Initialize gallery modal for Safari
       setTimeout(() => {
         initSafariGalleryModal();
       }, 100);
     } else {
-      // Initialize videos normally for other browsers
       initializePropertyVideos();
     }
   }
@@ -388,13 +483,11 @@ const websiteDisplay = property.website
 
     let featuredImageSrc = null;
 
-    // Try to get from window.propertyFeaturedImage (passed from Astro)
     if (window.propertyFeaturedImage) {
       featuredImageSrc = window.propertyFeaturedImage;
       console.log('Safari: Using Astro featured image:', featuredImageSrc);
     }
 
-    // Fallback: Look for existing images in DOM
     if (!featuredImageSrc) {
       const existingImg = document.querySelector(
         '.images-sidebar img, .gallery-item img'
@@ -411,7 +504,6 @@ const websiteDisplay = property.website
       return;
     }
 
-    // Replace videos with the featured image
     replaceVideosWithImage(featuredImageSrc);
   }
 
@@ -419,7 +511,6 @@ const websiteDisplay = property.website
     const allVideos = document.querySelectorAll('video');
     allVideos.forEach((video) => {
       video.style.display = 'none';
-      // Also hide the parent container if it only contains the video
       const parent = video.parentElement;
       if (parent && parent.children.length === 1) {
         parent.style.display = 'none';
@@ -430,7 +521,6 @@ const websiteDisplay = property.website
   function replaceVideosWithImage(imageSrc) {
     console.log('Safari: Replacing videos with image:', imageSrc);
 
-    // Replace desktop sidebar video (inside .gallery-item div)
     const sidebarVideoContainers = document.querySelectorAll(
       '.images-sidebar .gallery-item'
     );
@@ -439,45 +529,45 @@ const websiteDisplay = property.website
       if (video) {
         console.log(`Safari: Replacing sidebar video ${index}`);
 
-        // Create replacement image
+        const imageContainer = document.createElement('div');
+        imageContainer.className = 'image-container';
+
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton-placeholder';
+
         const img = document.createElement('img');
         img.src = imageSrc;
         img.alt = 'Property featured image';
-        img.className = 'property-featured-img gallery-item';
+        img.className = 'property-featured-img gallery-item-img';
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.3s ease';
 
-        // Copy data-index from container or video
         const dataIndex = container.getAttribute('data-index') || '0';
-        img.setAttribute('data-index', dataIndex);
+        container.setAttribute('data-index', dataIndex);
 
-        // Copy width
         if (video.getAttribute('width')) {
           img.setAttribute('width', video.getAttribute('width'));
         }
 
-        // Apply styling
-        img.style.cssText = `
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        cursor: pointer;
-      `;
+        img.onload = function () {
+          this.style.opacity = '1';
+          skeleton.style.display = 'none';
+        };
 
-        // Replace video with image
+        imageContainer.appendChild(skeleton);
+        imageContainer.appendChild(img);
         container.innerHTML = '';
-        container.appendChild(img);
+        container.appendChild(imageContainer);
 
-        // Ensure container keeps gallery-item class
         if (!container.classList.contains('gallery-item')) {
           container.classList.add('gallery-item');
         }
       }
     });
 
-    // Handle mobile gallery videos (in glide slides) - IMPROVED
     const mobileGallery = document.querySelector('.glide-gallery');
     if (mobileGallery) {
       const gallerySlides = mobileGallery.querySelectorAll('.glide__slide');
-      const slidesContainer = mobileGallery.querySelector('.glide__slides');
 
       gallerySlides.forEach((slide, index) => {
         const video = slide.querySelector('video');
@@ -486,22 +576,30 @@ const websiteDisplay = property.website
             `Safari: Replacing mobile gallery video ${index} with featured image`
           );
 
-          // Instead of removing the slide, replace the video with the featured image
+          const imageContainer = document.createElement('div');
+          imageContainer.className = 'mobile-image-container';
+
+          const skeleton = document.createElement('div');
+          skeleton.className = 'skeleton-placeholder';
+
           const img = document.createElement('img');
           img.src = imageSrc;
           img.alt = 'Featured Image';
           img.className = 'gallery-image';
           img.setAttribute('width', '689');
           img.setAttribute('height', '400');
-          img.style.cssText = `
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        `;
+          img.style.opacity = '0';
+          img.style.transition = 'opacity 0.3s ease';
 
-          // Replace video with image in the same slide
+          img.onload = function () {
+            this.style.opacity = '1';
+            skeleton.style.display = 'none';
+          };
+
+          imageContainer.appendChild(skeleton);
+          imageContainer.appendChild(img);
           slide.innerHTML = '';
-          slide.appendChild(img);
+          slide.appendChild(imageContainer);
 
           console.log(
             'Safari: Successfully replaced mobile gallery video with featured image'
@@ -509,7 +607,6 @@ const websiteDisplay = property.website
         }
       });
 
-      // Check remaining slides
       const remainingSlides = mobileGallery.querySelectorAll('.glide__slide');
       console.log(
         `Safari: Mobile gallery now has ${remainingSlides.length} slides`
@@ -578,6 +675,7 @@ const websiteDisplay = property.website
         let img = null;
         let imageSrc = null;
 
+        // Handle both direct img elements and img within containers
         if (item.tagName === 'IMG') {
           img = item;
           imageSrc = item.src;
@@ -820,6 +918,7 @@ const websiteDisplay = property.website
   document.addEventListener('DOMContentLoaded', () => {
     console.log('PropertyDetail: DOM Content Loaded');
     handleImagesSidebarLayout();
+    handleBackgroundImageLoad();
     initializePropertyDetailVideos();
   });
 
@@ -828,6 +927,7 @@ const websiteDisplay = property.website
     console.log('PropertyDetail: After view transition');
     setTimeout(() => {
       handleImagesSidebarLayout();
+      handleBackgroundImageLoad();
       initializePropertyDetailVideos();
     }, 50);
   });
