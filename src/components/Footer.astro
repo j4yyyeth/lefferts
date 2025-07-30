@@ -95,16 +95,11 @@ const { showNewsletter = true } = Astro.props;
     const newsletterForm = document.querySelector('.newsletter-form');
     
     if (!newsletterForm) {
-      console.log('Newsletter form not found');
       return;
     }
 
-    console.log('Newsletter form found, initializing...');
-
-    // Remove any existing event listeners
     newsletterForm.removeEventListener('submit', handleNewsletterSubmit);
     
-    // Add the event listener
     newsletterForm.addEventListener('submit', handleNewsletterSubmit);
   }
 
@@ -112,12 +107,10 @@ const { showNewsletter = true } = Astro.props;
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('Newsletter form submission intercepted');
 
     const submitButton = this.querySelector('.newsletter-submit');
     const originalText = submitButton.textContent;
 
-    // Show loading state
     submitButton.textContent = 'SENDING...';
     submitButton.disabled = true;
     submitButton.style.opacity = '0.7';
@@ -129,7 +122,6 @@ const { showNewsletter = true } = Astro.props;
       email: formData.get('email'),
     };
 
-    console.log('Newsletter data to send:', data);
 
     try {
       const response = await fetch('/form-handler.php', {
@@ -140,9 +132,7 @@ const { showNewsletter = true } = Astro.props;
         body: JSON.stringify(data),
       });
 
-      console.log('Newsletter response status:', response.status);
 
-      // Check if response is actually JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const textResponse = await response.text();
@@ -154,10 +144,8 @@ const { showNewsletter = true } = Astro.props;
       }
 
       const result = await response.json();
-      console.log('Newsletter response data:', result);
 
       if (response.ok && result.success) {
-        // Show success message
         const container = document.querySelector('.newsletter-container');
         container.innerHTML = `
           <div class="newsletter-success" style="text-align: center;">
@@ -174,7 +162,6 @@ const { showNewsletter = true } = Astro.props;
           alert('Error: ' + errorMessage);
         }
 
-        // Reset button
         submitButton.textContent = originalText;
         submitButton.disabled = false;
         submitButton.style.opacity = '1';
@@ -196,26 +183,22 @@ const { showNewsletter = true } = Astro.props;
 
       alert(errorMessage);
 
-      // Reset button
       submitButton.textContent = originalText;
       submitButton.disabled = false;
       submitButton.style.opacity = '1';
     }
   }
 
-  // Initialize on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeNewsletterForm);
   } else {
     initializeNewsletterForm();
   }
 
-  // Re-initialize after view transitions (for Astro)
   document.addEventListener('astro:after-swap', () => {
     setTimeout(initializeNewsletterForm, 50);
   });
 
-  // Also initialize after page load as a fallback
   window.addEventListener('load', initializeNewsletterForm);
 </script>
 

@@ -194,7 +194,7 @@ const robotsContent = `${noindex ? 'noindex' : 'index'},${nofollow ? 'nofollow' 
         setTimeout(() => {
           const heroVideo = document.querySelector('.hero-vid video');
           if (heroVideo && heroVideo.paused) {
-            heroVideo.play().catch((e) => console.log('Focus play failed:', e));
+            heroVideo.play().catch((e) => {});
           }
         }, 100);
       });
@@ -208,7 +208,7 @@ const robotsContent = `${noindex ? 'noindex' : 'index'},${nofollow ? 'nofollow' 
                 video.currentTime = 0;
                 video
                   .play()
-                  .catch((e) => console.log('Pageshow play failed:', e));
+                  .catch((e) => {});
               }
             });
           }, 200);

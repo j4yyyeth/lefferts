@@ -24,7 +24,6 @@ const { text, videoSrc } = Astro.props;
         Your browser does not support the video tag.
       </video>
     )}
-    {/* Fallback background while video loads */}
     <div class="hero-fallback" style="position: absolute; inset: 0; background: #fff; z-index: -1;"></div>
   </div>
   <div class="hero-content" style="opacity: 0; transition: opacity 0.5s ease 0.2s;">
@@ -36,32 +35,27 @@ const { text, videoSrc } = Astro.props;
 </div>
 
 <script>
-  // Hero-specific video initialization
   function initializeHeroVideoComponent() {
     const heroVideo = document.querySelector('[data-hero-video]') as HTMLVideoElement;
     const heroContent = document.querySelector('.hero-content') as HTMLElement;
     const heroArrow = document.querySelector('.arrow') as HTMLElement;
     
     if (heroVideo) {
-      // Ensure all required attributes are set
       heroVideo.muted = true;
       heroVideo.playsInline = true;
       heroVideo.autoplay = true;
       heroVideo.loop = true;
       
-      // Safari-specific attributes
       heroVideo.setAttribute('webkit-playsinline', 'true');
       heroVideo.setAttribute('playsinline', 'true');
       
       let videoStarted = false;
       
-      // Function to show video smoothly
       const showVideo = () => {
         if (!videoStarted) {
           heroVideo.style.opacity = '1';
           videoStarted = true;
           
-          // Show content after video appears with CSS transitions
           setTimeout(() => {
             if (heroContent) heroContent.style.opacity = '1';
           }, 200);
@@ -72,7 +66,6 @@ const { text, videoSrc } = Astro.props;
         }
       };
       
-      // Force video to start
       const startVideo = () => {
         heroVideo.currentTime = 0;
         const playPromise = heroVideo.play();
@@ -80,22 +73,17 @@ const { text, videoSrc } = Astro.props;
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
-              console.log('Hero video started successfully');
               showVideo();
             })
             .catch(error => {
-              console.log('Hero video autoplay prevented:', error);
-              // Show content even if video fails
               showVideo();
               
-              // Try again on user interaction
               const playOnTouch = () => {
                 heroVideo.play()
                   .then(() => {
-                    console.log('Hero video started on interaction');
                     showVideo();
                   })
-                  .catch(e => console.log('Hero video interaction play failed:', e));
+                  .catch(() => {});
               };
               
               document.addEventListener('click', playOnTouch, { once: true });
@@ -104,7 +92,6 @@ const { text, videoSrc } = Astro.props;
         }
       };
       
-      // Start video when it's ready
       if (heroVideo.readyState >= 2) {
         startVideo();
       } else {
@@ -113,41 +100,34 @@ const { text, videoSrc } = Astro.props;
           if (!videoStarted) startVideo();
         }, { once: true });
         
-        // Fallback timeout to show content
         setTimeout(() => {
           if (!videoStarted) {
-            console.log('Video loading timeout, showing content anyway');
             showVideo();
           }
         }, 2000);
       }
       
-      // Handle video errors
       heroVideo.addEventListener('error', (e) => {
         console.error('Hero video error:', e);
-        showVideo(); // Show content even on error
+        showVideo();
       });
       
-      // Ensure proper looping
       heroVideo.addEventListener('ended', () => {
         heroVideo.currentTime = 0;
-        heroVideo.play().catch(e => console.log('Hero video loop failed:', e));
+        heroVideo.play().catch(() => {});
       });
     } else {
-      // No video, just show content
       if (heroContent) heroContent.style.opacity = '1';
       if (heroArrow) heroArrow.style.opacity = '1';
     }
   }
   
-  // Initialize immediately if DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeHeroVideoComponent);
   } else {
     initializeHeroVideoComponent();
   }
   
-  // Re-initialize after view transitions
   document.addEventListener('astro:after-swap', () => {
     setTimeout(initializeHeroVideoComponent, 50);
   });

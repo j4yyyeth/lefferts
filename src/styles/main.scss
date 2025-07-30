@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables' as *;
 
 * {
   margin: 0;
@@ -1550,38 +1550,70 @@ footer {
   }
 }
 
+/* Replace the existing @media (max-width: 600px) mobile menu styles with this: */
+
 @media (max-width: 600px) {
   .mobile-menu {
+    position: relative;
+    width: 100%;
+    height: 60px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
   }
 
   .hamburger {
-    position: unset;
-    transform: translateY(-5%);
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     padding: 10px;
+    z-index: 1001;
   }
 
   a:has(.logo-img) {
-    width: 100%;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: auto !important;
     display: flex;
     justify-content: center;
+    align-items: center;
+  }
+
+  .logo-img {
+    width: 250px;
+  }
+}
+
+@media (max-width: 450px) {
+  .hamburger .line {
+    width: 35px !important;
+    height: 2px !important;
+    margin: 9px 0 !important;
+  }
+  header {
+    padding: 15px 0 !important;
+  }
+}
+
+@media (max-width: 385px) {
+  .logo-img {
+    width: 215px !important;
+  }
+  .hamburger .line {
+    margin: 8px 0 !important;
   }
 }
 
 @media (max-width: 375px) {
-  a:has(.logo-img) {
-    width: unset;
+  .hamburger {
+    left: 15px;
+    padding: 8px;
   }
 
   .logo-img {
-    margin-left: 0;
     width: 220px;
-  }
-
-  .hamburger {
-    padding: 8px;
   }
 }
 
@@ -1994,14 +2026,13 @@ footer {
   img,
   video {
     height: 600px !important;
+    width: 100%;
     @media (max-width: 675px) {
       height: 400px !important;
     }
     @media (max-width: 400px) {
       height: 300px !important;
     }
-    width: 100%;
-
     @media (max-width: 415px) {
       height: 250px !important;
     }
@@ -2024,10 +2055,6 @@ footer {
     background: $color-white;
     height: 60px;
     width: 69px;
-    @media (max-width: 400px) {
-      width: 39px;
-      height: 50px;
-    }
     border-radius: 0;
     pointer-events: all;
     cursor: pointer;
@@ -2037,6 +2064,11 @@ footer {
     justify-content: center;
     border: none;
     position: relative;
+
+    @media (max-width: 400px) {
+      width: 39px;
+      height: 50px;
+    }
 
     .arrow-left,
     .arrow-right {
@@ -3105,4 +3137,19 @@ button.show-articles {
 
 .form-group:has(.cf-turnstile) {
   display: none !important;
+}
+
+@media (max-width: 450px) {
+  header .hamburger#hamburger-1.is-active .line:nth-child(1) {
+    transform: translateY(10px) rotate(45deg);
+  }
+  header .hamburger#hamburger-1.is-active .line:nth-child(3) {
+    transform: translateY(-12px) rotate(-45deg);
+  }
+}
+
+@media (max-width: 385px) {
+  header .hamburger#hamburger-1.is-active .line:nth-child(3) {
+    transform: translateY(-10px) rotate(-45deg);
+  }
 }

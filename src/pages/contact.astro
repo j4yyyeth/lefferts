@@ -55,8 +55,6 @@ import ContactForm from '../components/ContactForm.astro';
 
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
-    console.log('Safari detected:', isSafari);
-
     if (isSafari) {
       initializeSafariImageFallback(
         heroVideo,
@@ -91,8 +89,6 @@ import ContactForm from '../components/ContactForm.astro';
   function initializeSafariImageFallback(videoElement, imageSrc, onReady) {
     if (!videoElement) return;
 
-    console.log('Replacing video with image for Safari:', imageSrc);
-
     const img = document.createElement('img');
     img.src = imageSrc;
     img.alt = 'Contact background';
@@ -114,12 +110,10 @@ import ContactForm from '../components/ContactForm.astro';
     };
 
     img.addEventListener('load', () => {
-      console.log('Safari fallback image loaded successfully');
       showImage();
     });
 
     img.addEventListener('error', () => {
-      console.error('Safari fallback image failed to load:', imageSrc);
       showImage();
     });
 
@@ -163,24 +157,18 @@ import ContactForm from '../components/ContactForm.astro';
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            console.log('Contact video started successfully');
             showVideo();
           })
           .catch((error) => {
-            console.log('Contact video autoplay prevented:', error);
             showVideo();
 
-            // Try again on user interaction
             const playOnTouch = () => {
               video
                 .play()
                 .then(() => {
-                  console.log('Contact video started on interaction');
                   showVideo();
                 })
-                .catch((e) =>
-                  console.log('Contact video interaction play failed:', e)
-                );
+                .catch((e) => {});
             };
 
             document.addEventListener('click', playOnTouch, { once: true });
@@ -191,7 +179,6 @@ import ContactForm from '../components/ContactForm.astro';
       }
     };
 
-    // Start video when it's ready
     if (video.readyState >= 2) {
       startVideo();
     } else {
@@ -204,36 +191,29 @@ import ContactForm from '../components/ContactForm.astro';
         { once: true }
       );
 
-      // Fallback timeout to show video
       setTimeout(() => {
         if (!videoStarted) {
-          console.log('Contact video loading timeout, showing anyway');
           showVideo();
         }
       }, 2000);
     }
 
-    // Handle video errors
     video.addEventListener('error', (e) => {
-      console.error('Contact video error:', e);
-      showVideo(); // Show video element even on error
+      showVideo();
     });
 
-    // Ensure proper looping
     video.addEventListener('ended', () => {
       video.currentTime = 0;
-      video.play().catch((e) => console.log('Contact video loop failed:', e));
+      video.play().catch((e) => {});
     });
   }
 
-  // Initialize immediately if DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeContactVideos);
   } else {
     initializeContactVideos();
   }
 
-  // Re-initialize after view transitions
   document.addEventListener('astro:after-swap', () => {
     setTimeout(initializeContactVideos, 50);
   });

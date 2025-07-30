@@ -20,34 +20,26 @@ export interface Props {
 
 const { property } = Astro.props;
 
-// Get all properties and filter out the current one
 const allProperties = portfolioData.properties;
 const currentPropertyIndex = allProperties.findIndex(
   (p) => p.id === property.id
 );
 
-// Create a list of other properties starting from the next one in order
 let otherProperties = [];
 if (currentPropertyIndex !== -1) {
-  // Get properties after current one
   const propertiesAfter = allProperties.slice(currentPropertyIndex + 1);
-  // Get properties before current one
   const propertiesBefore = allProperties.slice(0, currentPropertyIndex);
-  // Combine them (after + before) to maintain order but exclude current
   otherProperties = [...propertiesAfter, ...propertiesBefore];
 } else {
-  // Fallback: if current property not found, show all others
   otherProperties = allProperties.filter((p) => p.id !== property.id);
 }
 
-// Calculate layout based on media count
 const totalMedia =
   (property.featuredVideo ? 1 : 0) +
   (property.featuredImage ? 1 : 0) +
   (property.gallery ? property.gallery.length : 0);
 const layoutClass = totalMedia >= 4 ? 'grid-layout' : 'flex-layout';
 
-// Get website URL without protocol for display
 const websiteDisplay = property.website
   ? property.website.replace(/^https?:\/\//, '')
   : '';
@@ -55,7 +47,6 @@ const websiteDisplay = property.website
 
 <main class="page-wrapper">
   <div class="container">
-    <!-- Mobile Gallery -->
     {
       property.gallery && property.gallery.length > 0 && (
         <div class="glide glide-gallery glide-first">
@@ -129,7 +120,6 @@ const websiteDisplay = property.website
     }
 
     <div class="property-wrapper">
-      <!-- Desktop Image Sidebar -->
       <div class={`images-sidebar ${layoutClass}`}>
         {
           property.featuredVideo && (
@@ -169,7 +159,6 @@ const websiteDisplay = property.website
         {
           property.gallery &&
             property.gallery.map((image, index) => {
-              // Calculate the correct data-index based on whether there's a featured video or image
               const dataIndex =
                 property.featuredVideo || property.featuredImage
                   ? index + 1
@@ -195,13 +184,11 @@ const websiteDisplay = property.website
         }
       </div>
 
-      <!-- Property Info -->
       <div class="property-info-wrapper">
         <div class="property-info">
           <h1>{property.title}</h1>
           <div set:html={property.content} />
 
-          {/* Count paragraphs to show read more button if needed */}
           {
             property.content && property.content.split('<p>').length > 2 && (
               <button class="read-more-property">Read More</button>
@@ -281,7 +268,6 @@ const websiteDisplay = property.website
     </div>
   </div>
 
-  <!-- Additional Projects Slider -->
   <div class="glide-posts-container">
     <h3>Additional Projects</h3>
     <div class="glide glide-posts">
@@ -317,7 +303,6 @@ const websiteDisplay = property.website
   </div>
 </main>
 
-<!-- Gallery Modal -->
 <div id="galleryModal" class="modal" transition:persist>
   <div class="modal-content">
     <div class="glide glide-modal">
@@ -455,9 +440,12 @@ const websiteDisplay = property.website
       if (directImages.length < 3) {
         sidebar.style.gridTemplateColumns = 'none';
       } else {
-        sidebar.style.gridTemplateColumns = ''; // Reset to CSS default
+        sidebar.style.gridTemplateColumns = '';
       }
     });
+  }
+
+  function handleBackgroundImageLoad() {
   }
 
   function initializePropertyDetailVideos() {
@@ -466,10 +454,9 @@ const websiteDisplay = property.website
     window.isSafariBrowser = isSafari;
     window.safariVideoFixApplied = isSafari;
 
-    console.log('PropertyDetail: Safari detected:', isSafari);
-
     if (isSafari) {
       replaceSafariVideosWithImage();
+      ensureSkeletonsRemoved();
       setTimeout(() => {
         initSafariGalleryModal();
       }, 100);
@@ -479,13 +466,10 @@ const websiteDisplay = property.website
   }
 
   function replaceSafariVideosWithImage() {
-    console.log('Safari: Starting video replacement');
-
     let featuredImageSrc = null;
 
     if (window.propertyFeaturedImage) {
       featuredImageSrc = window.propertyFeaturedImage;
-      console.log('Safari: Using Astro featured image:', featuredImageSrc);
     }
 
     if (!featuredImageSrc) {
@@ -494,12 +478,10 @@ const websiteDisplay = property.website
       );
       if (existingImg) {
         featuredImageSrc = existingImg.src;
-        console.log('Safari: Using DOM image:', featuredImageSrc);
       }
     }
 
     if (!featuredImageSrc) {
-      console.log('Safari: No image found, hiding videos');
       hideAllVideos();
       return;
     }
@@ -519,21 +501,21 @@ const websiteDisplay = property.website
   }
 
   function replaceVideosWithImage(imageSrc) {
-    console.log('Safari: Replacing videos with image:', imageSrc);
-
     const sidebarVideoContainers = document.querySelectorAll(
       '.images-sidebar .gallery-item'
     );
     sidebarVideoContainers.forEach((container, index) => {
       const video = container.querySelector('video');
       if (video) {
-        console.log(`Safari: Replacing sidebar video ${index}`);
+        let skeleton = container.querySelector('.skeleton-placeholder');
+        if (!skeleton) {
+          skeleton = document.createElement('div');
+          skeleton.className = 'skeleton-placeholder';
+          container.appendChild(skeleton);
+        }
 
         const imageContainer = document.createElement('div');
         imageContainer.className = 'image-container';
-
-        const skeleton = document.createElement('div');
-        skeleton.className = 'skeleton-placeholder';
 
         const img = document.createElement('img');
         img.src = imageSrc;
@@ -543,7 +525,6 @@ const websiteDisplay = property.website
         img.style.transition = 'opacity 0.3s ease';
 
         const dataIndex = container.getAttribute('data-index') || '0';
-        container.setAttribute('data-index', dataIndex);
 
         if (video.getAttribute('width')) {
           img.setAttribute('width', video.getAttribute('width'));
@@ -551,14 +532,26 @@ const websiteDisplay = property.website
 
         img.onload = function () {
           this.style.opacity = '1';
-          skeleton.style.display = 'none';
+          const currentSkeleton = this.closest('.gallery-item').querySelector('.skeleton-placeholder');
+          if (currentSkeleton) {
+            currentSkeleton.style.display = 'none';
+          }
         };
 
-        imageContainer.appendChild(skeleton);
-        imageContainer.appendChild(img);
-        container.innerHTML = '';
-        container.appendChild(imageContainer);
+        img.onerror = function () {
+          const currentSkeleton = this.closest('.gallery-item').querySelector('.skeleton-placeholder');
+          if (currentSkeleton) {
+            currentSkeleton.style.display = 'none';
+          }
+          this.style.opacity = '1';
+        };
 
+        container.innerHTML = '';
+        container.appendChild(skeleton);
+        container.appendChild(imageContainer);
+        imageContainer.appendChild(img);
+
+        container.setAttribute('data-index', dataIndex);
         if (!container.classList.contains('gallery-item')) {
           container.classList.add('gallery-item');
         }
@@ -572,15 +565,15 @@ const websiteDisplay = property.website
       gallerySlides.forEach((slide, index) => {
         const video = slide.querySelector('video');
         if (video) {
-          console.log(
-            `Safari: Replacing mobile gallery video ${index} with featured image`
-          );
+          let skeleton = slide.querySelector('.skeleton-placeholder');
+          if (!skeleton) {
+            skeleton = document.createElement('div');
+            skeleton.className = 'skeleton-placeholder';
+            slide.appendChild(skeleton);
+          }
 
           const imageContainer = document.createElement('div');
           imageContainer.className = 'mobile-image-container';
-
-          const skeleton = document.createElement('div');
-          skeleton.className = 'skeleton-placeholder';
 
           const img = document.createElement('img');
           img.src = imageSrc;
@@ -593,53 +586,50 @@ const websiteDisplay = property.website
 
           img.onload = function () {
             this.style.opacity = '1';
-            skeleton.style.display = 'none';
+            const currentSkeleton = this.closest('.glide__slide').querySelector('.skeleton-placeholder');
+            if (currentSkeleton) {
+              currentSkeleton.style.display = 'none';
+            }
           };
 
-          imageContainer.appendChild(skeleton);
-          imageContainer.appendChild(img);
-          slide.innerHTML = '';
-          slide.appendChild(imageContainer);
+          img.onerror = function () {
+            const currentSkeleton = this.closest('.glide__slide').querySelector('.skeleton-placeholder');
+            if (currentSkeleton) {
+              currentSkeleton.style.display = 'none';
+            }
+            this.style.opacity = '1';
+          };
 
-          console.log(
-            'Safari: Successfully replaced mobile gallery video with featured image'
-          );
+          slide.innerHTML = '';
+          slide.appendChild(skeleton);
+          slide.appendChild(imageContainer);
+          imageContainer.appendChild(img);
         }
       });
 
       const remainingSlides = mobileGallery.querySelectorAll('.glide__slide');
-      console.log(
-        `Safari: Mobile gallery now has ${remainingSlides.length} slides`
-      );
 
       if (remainingSlides.length === 0) {
-        console.log('Safari: No slides left in mobile gallery, hiding it');
         mobileGallery.style.display = 'none';
       }
     }
 
-    // Replace modal videos (in modal slides)
     const modalSlides = document.querySelectorAll('.glide-modal .glide__slide');
     const modalSlidesToRemove = [];
 
     modalSlides.forEach((slide, index) => {
       const video = slide.querySelector('video');
       if (video) {
-        console.log(`Safari: Marking modal slide video ${index} for removal`);
         modalSlidesToRemove.push(slide);
       }
     });
 
-    // Remove video slides
     modalSlidesToRemove.forEach((slide) => slide.remove());
 
-    // Check if modal has any slides left, if not hide modal functionality
     const modalGallery = document.querySelector('.glide-modal');
     if (modalGallery) {
-      const remainingModalSlides =
-        modalGallery.querySelectorAll('.glide__slide');
+      const remainingModalSlides = modalGallery.querySelectorAll('.glide__slide');
       if (remainingModalSlides.length === 0) {
-        console.log('Safari: No slides left in modal, hiding modal');
         const modal = document.getElementById('galleryModal');
         if (modal) {
           modal.style.display = 'none';
@@ -648,26 +638,30 @@ const websiteDisplay = property.website
     }
   }
 
-  function initSafariGalleryModal() {
-    console.log('Safari: Initializing gallery modal');
+  function ensureSkeletonsRemoved() {
+    setTimeout(() => {
+      const remainingSkeletons = document.querySelectorAll('.skeleton-placeholder');
+      remainingSkeletons.forEach(skeleton => {
+        if (skeleton.style.display !== 'none') {
+          skeleton.style.display = 'none';
+        }
+      });
+    }, 5000);
+  }
 
+  function initSafariGalleryModal() {
     const modal = document.getElementById('galleryModal');
     const galleryItems = document.querySelectorAll('.gallery-item');
     const closeBtn = document.querySelector('.close');
 
     if (!modal || !galleryItems.length) {
-      console.log('Safari: No modal or gallery items found');
       return;
     }
 
-    console.log(`Safari: Found ${galleryItems.length} gallery items`);
-
-    // Rebuild modal slides for Safari (only images, no videos)
     const modalSlidesContainer = modal.querySelector('.glide__slides');
     if (modalSlidesContainer) {
       modalSlidesContainer.innerHTML = '';
 
-      // Create a set to track unique image sources to prevent duplicates
       const uniqueImages = new Set();
       const validSlides = [];
 
@@ -675,7 +669,6 @@ const websiteDisplay = property.website
         let img = null;
         let imageSrc = null;
 
-        // Handle both direct img elements and img within containers
         if (item.tagName === 'IMG') {
           img = item;
           imageSrc = item.src;
@@ -684,7 +677,6 @@ const websiteDisplay = property.website
           imageSrc = img ? img.src : null;
         }
 
-        // Only add if we have an image and it's not a duplicate
         if (img && imageSrc && !uniqueImages.has(imageSrc)) {
           uniqueImages.add(imageSrc);
 
@@ -703,19 +695,11 @@ const websiteDisplay = property.website
           slide.appendChild(modalImg);
           modalSlidesContainer.appendChild(slide);
           validSlides.push({ element: item, slideIndex: validSlides.length });
-
-          console.log(`Safari: Added unique slide for ${img.alt || 'image'}`);
-        } else if (imageSrc && uniqueImages.has(imageSrc)) {
-          console.log(`Safari: Skipped duplicate image: ${imageSrc}`);
         }
       });
-
-      console.log(`Safari: Created ${validSlides.length} unique modal slides`);
     }
 
-    // Add click handlers to gallery items with correct slide mapping
     galleryItems.forEach((item, index) => {
-      // Clone element to remove existing listeners
       const newItem = item.cloneNode(true);
       const parent = item.parentNode;
       parent.replaceChild(newItem, item);
@@ -724,7 +708,6 @@ const websiteDisplay = property.website
         event.preventDefault();
         event.stopPropagation();
 
-        // Find the corresponding slide index for this image
         let imageSrc = null;
         if (newItem.tagName === 'IMG') {
           imageSrc = newItem.src;
@@ -733,7 +716,6 @@ const websiteDisplay = property.website
           imageSrc = img ? img.src : null;
         }
 
-        // Find the slide index that matches this image source
         let slideIndex = 0;
         if (imageSrc) {
           const modalSlides = modal.querySelectorAll('.glide__slide img');
@@ -744,22 +726,15 @@ const websiteDisplay = property.website
           });
         }
 
-        console.log(
-          `Safari: Gallery item clicked, opening modal at slide ${slideIndex}`
-        );
-
-        // Show modal
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
 
-        // Initialize Glide slider
         setTimeout(() => {
           initSafariModalSlider(slideIndex);
         }, 50);
       });
     });
 
-    // Close modal handlers
     function closeModal() {
       modal.style.display = 'none';
       document.body.style.overflow = '';
@@ -787,28 +762,21 @@ const websiteDisplay = property.website
         closeModal();
       }
     });
-
-    console.log('Safari: Gallery modal initialized');
   }
 
   function initSafariModalSlider(startIndex = 0) {
-    console.log(`Safari: Initializing modal slider at index ${startIndex}`);
-
     if (typeof Glide === 'undefined') {
-      console.log('Safari: Glide not available');
       return;
     }
 
     const modalSlider = document.querySelector('.glide-modal');
     if (!modalSlider) {
-      console.log('Safari: Modal slider not found');
       return;
     }
 
     const slides = modalSlider.querySelectorAll('.glide__slide');
     const validIndex = Math.max(0, Math.min(startIndex, slides.length - 1));
 
-    // Destroy existing instance
     if (window.safariModalGlide) {
       try {
         window.safariModalGlide.destroy();
@@ -827,62 +795,38 @@ const websiteDisplay = property.website
         rewind: true,
         animationDuration: 300,
       }).mount();
-
-      console.log(`Safari: Modal slider initialized at index ${validIndex}`);
     } catch (error) {
-      console.error('Safari: Modal slider error:', error);
     }
   }
 
   function initializePropertyVideos() {
-    console.log('Initializing property videos for non-Safari browser');
-
     const videos = document.querySelectorAll('video');
 
     videos.forEach((video, index) => {
-      console.log(`Initializing video ${index}:`, video.className);
-
-      // Skip modal videos as they should be controlled by user
       if (video.classList.contains('modal-media')) {
-        console.log(`Skipping modal video ${index}`);
         return;
       }
 
-      // Set video properties
       video.muted = true;
       video.playsInline = true;
       video.autoplay = true;
       video.loop = true;
 
-      // Safari-specific attributes
       video.setAttribute('webkit-playsinline', 'true');
       video.setAttribute('playsinline', 'true');
 
-      // Try to play the video
       const playVideo = () => {
         const playPromise = video.play();
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
-              console.log(`Property video ${index} started successfully`);
             })
             .catch((error) => {
-              console.log(`Property video ${index} autoplay prevented:`, error);
-
               const playOnInteraction = () => {
                 video
                   .play()
-                  .then(() =>
-                    console.log(
-                      `Property video ${index} started on interaction`
-                    )
-                  )
-                  .catch((e) =>
-                    console.log(
-                      `Property video ${index} interaction play failed:`,
-                      e
-                    )
-                  );
+                  .then(() => {})
+                  .catch((e) => {});
               };
 
               document.addEventListener('click', playOnInteraction, {
@@ -902,29 +846,24 @@ const websiteDisplay = property.website
       }
 
       video.addEventListener('error', (e) => {
-        console.error(`Property video ${index} error:`, e);
       });
 
       video.addEventListener('ended', () => {
         video.currentTime = 0;
         video
           .play()
-          .catch((e) => console.log(`Property video ${index} loop failed:`, e));
+          .catch((e) => {});
       });
     });
   }
 
-  // Initialize when DOM is ready
   document.addEventListener('DOMContentLoaded', () => {
-    console.log('PropertyDetail: DOM Content Loaded');
     handleImagesSidebarLayout();
     handleBackgroundImageLoad();
     initializePropertyDetailVideos();
   });
 
-  // Re-initialize after view transitions
   document.addEventListener('astro:after-swap', () => {
-    console.log('PropertyDetail: After view transition');
     setTimeout(() => {
       handleImagesSidebarLayout();
       handleBackgroundImageLoad();
